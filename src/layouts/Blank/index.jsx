@@ -37,11 +37,18 @@ export class BlankLayout extends Component {
 
   get title() {
     const {
-      title = { zh: t('The Rackspace Cloud'), en: 'The Rackspace Cloud' },
+      title = {
+        zh: t('The Sovereign Next Cloud'),
+        en: 'The Sovereign Next Cloud',
+      },
     } = this.info;
     const { getLocaleShortName } = i18n;
     const language = getLocaleShortName();
-    return title[language] || t('The Rackspace Cloud') || 'The Rackspace Cloud';
+    return (
+      title[language] ||
+      t('The Sovereign Next Cloud') ||
+      'The Sovereign Next Cloud'
+    );
   }
 
   render() {

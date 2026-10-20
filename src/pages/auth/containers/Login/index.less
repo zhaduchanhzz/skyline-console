@@ -42,7 +42,7 @@
 
       &:hover {
         background: #fff !important;
-        border-color: #a33e3e !important;
+        border-color: #1769ff !important;
       }
     }
 
@@ -154,7 +154,7 @@
       font-size: 14px !important;
       background: #fafafa !important;
       border: 1.5px solid #e5e7eb !important;
-      border-radius: 10px !important;
+      border-radius: 8px !important;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 
       &::placeholder {
@@ -163,17 +163,22 @@
       }
 
       &:hover {
-        background: #f9fafb !important;
-        border-color: #d1d5db !important;
+        background: #fff !important;
+        border-color: #1769ff !important;
       }
 
       &:focus,
-      &.ant-input-focused,
-      &.ant-select-focused .ant-select-selector {
+      &.ant-input-focused {
         background: #fff !important;
-        border-color: #a33e3e !important;
-        box-shadow: 0 0 0 3px rgba(163, 62, 62, 10%) !important;
+        border-color: #1769ff !important;
+        box-shadow: 0 0 0 3px rgba(23, 105, 255, 12%) !important;
       }
+    }
+
+    .ant-select-focused .ant-select-selector {
+      background: #fff !important;
+      border-color: #1769ff !important;
+      box-shadow: 0 0 0 3px rgba(23, 105, 255, 12%) !important;
     }
 
     // Password input focus styling - match other inputs exactly
@@ -181,8 +186,8 @@
       &:focus-within,
       &.ant-input-password-focused {
         background: #fff !important;
-        border-color: #a33e3e !important;
-        box-shadow: 0 0 0 3px rgba(163, 62, 62, 10%) !important;
+        border-color: #1769ff !important;
+        box-shadow: 0 0 0 3px rgba(23, 105, 255, 12%) !important;
       }
     }
 
@@ -291,16 +296,15 @@
   height: 44px !important;
   font-weight: 600 !important;
   font-size: 15px !important;
-  background: #a33e3e !important; // Original red color
+  background: #1769ff !important;
   border: none !important;
-  border-radius: 10px !important;
-  box-shadow: 0 4px 14px rgba(163, 62, 62, 40%) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(23, 105, 255, 24%) !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 
   &:hover {
-    background: #892424 !important;
-    box-shadow: 0 6px 20px rgba(163, 62, 62, 50%) !important;
-    transform: translateY(-1px) !important;
+    background: #0f5be6 !important;
+    box-shadow: 0 6px 18px rgba(23, 105, 255, 30%) !important;
   }
 
   &:active {
@@ -308,8 +312,8 @@
   }
 
   &:focus {
-    box-shadow: 0 4px 14px rgba(163, 62, 62, 40%),
-      0 0 0 3px rgba(163, 62, 62, 20%) !important;
+    box-shadow: 0 4px 14px rgba(23, 105, 255, 24%),
+      0 0 0 3px rgba(23, 105, 255, 20%) !important;
   }
 }
 
@@ -574,6 +578,19 @@
 }
 
 // Performance optimizations
+@media (max-width: 768px) and (max-height: 500px) and (orientation: landscape) {
+  .loginContainer {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  .scrollableContent {
+    flex: none;
+    overflow: visible;
+  }
+}
+
 .loginButton,
 .forgotPassword,
 .signupLink {
@@ -618,4 +635,68 @@
   line-height: 18px;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+// The form sits directly on the right panel of the split login screen.
+.loginContainer {
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+.langSelector {
+  top: 26px;
+  right: 30px;
+}
+
+.scrollableContent,
+.scrollableContent.expanded {
+  flex: none !important;
+  max-height: none;
+  padding: 0;
+  overflow: visible !important;
+}
+
+.welcomeMessage {
+  margin-bottom: 28px !important;
+  font-size: 25px !important;
+  text-align: center;
+}
+
+.bottomSection {
+  margin-top: 26px;
+  background: none;
+  border: 0;
+  backdrop-filter: none;
+}
+
+.loginButton {
+  height: 46px !important;
+}
+
+@media (max-width: 900px) {
+  .langSelector {
+    top: 18px;
+    right: 24px;
+  }
+
+  .welcomeMessage {
+    margin-bottom: 22px !important;
+    font-size: 23px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .langSelector {
+    top: 16px;
+    right: 18px;
+  }
+
+  .welcomeMessage {
+    font-size: 21px !important;
+  }
+
+  .bottomSection {
+    margin-top: 20px;
+  }
 }

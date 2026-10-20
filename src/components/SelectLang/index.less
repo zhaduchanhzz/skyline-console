@@ -9,10 +9,23 @@
 }
 
 .drop-down {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #4b5563;
   font-size: 16px;
   line-height: 20px;
   vertical-align: top;
+  border-radius: 8px;
   cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    color: #1769ff;
+    background-color: rgba(23, 105, 255, 10%);
+  }
 
   > i {
     font-size: 16px !important;

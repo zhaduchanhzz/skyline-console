@@ -1,0 +1,7 @@
+*
+!Dockerfile
+!docker/
+!docker/nginx.conf.template
+!skyline_console/
+!skyline_console/static/
+!skyline_console/static/**

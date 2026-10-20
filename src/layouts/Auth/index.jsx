@@ -23,18 +23,14 @@ import {
   formatUtcTime,
 } from 'resources/skyline/message-banner';
 
-import loginFullImageWebp from 'asset/image/login-full.webp';
-import loginFullImagePng from 'asset/image/login-full.png';
-// import genestackLogo from 'asset/image/genestackLogo.png';
-import openstackLogoWebp from 'asset/image/openstack-new-logo.webp';
-import openstackLogoPng from 'asset/image/openstack-new-logo.png';
+import SovereignBackground from './SovereignBackground';
 import styles from './index.less';
 
 export class AuthLayout extends Component {
   constructor(props) {
     super(props);
     this.routes = props.route.routes;
-    this.state = { backgroundLoaded: false, currentSlide: 0 };
+    this.state = { currentSlide: 0 };
   }
 
   componentDidMount() {
@@ -53,16 +49,6 @@ export class AuthLayout extends Component {
   componentWillUnmount() {
     clearInterval(this.autoSlideTimer);
   }
-
-  markBackgroundLoaded = () => {
-    if (!this.state.backgroundLoaded) {
-      this.setState({ backgroundLoaded: true });
-    }
-  };
-
-  handleBackgroundImageRef = (img) => {
-    if (img?.complete) this.markBackgroundLoaded();
-  };
 
   renderPublicBanners() {
     const banners = globalMessageBannerStore.publicBanners || [];
@@ -132,41 +118,34 @@ export class AuthLayout extends Component {
   }
 
   render() {
-    const { backgroundLoaded } = this.state;
-
     return (
       <div
         className={styles.container}
         role="main"
         aria-label="Authentication page"
       >
-        {/* Full-screen background */}
-        <div
-          className={styles.background}
-          role="presentation"
-          aria-hidden="true"
+        <section
+          className={styles.visualPanel}
+          aria-label="Sovereign Next cloud illustration"
         >
-          <picture>
-            <source srcSet={loginFullImageWebp} type="image/webp" />
-            <img
-              ref={this.handleBackgroundImageRef}
-              alt=""
-              className={styles.backgroundImage}
-              src={loginFullImagePng}
-              onLoad={this.markBackgroundLoaded}
-              onError={this.markBackgroundLoaded}
-              aria-hidden="true"
-            />
-          </picture>
-          <div className={styles.overlay} aria-hidden="true" />
-        </div>
+          <SovereignBackground />
+          <div
+            className={styles.brandingContainer}
+            role="banner"
+            aria-labelledby="brand-title"
+          >
+            <h2
+              id="brand-title"
+              className={styles.brandTitle}
+              aria-label="Sovereign Next"
+            >
+              Sovereign Next
+            </h2>
+          </div>
+        </section>
 
-        {/* Left column - Login content */}
-        <div
-          className={styles.leftColumn}
-          role="region"
-          aria-label="Login form section"
-        >
+        <section className={styles.formPanel} aria-label="Login form section">
+          {this.renderPublicBanners()}
           <div
             className={styles.cardContainer}
             role="form"
@@ -174,42 +153,7 @@ export class AuthLayout extends Component {
           >
             {renderRoutes(this.routes)}
           </div>
-        </div>
-
-        {/* Right column - Logo and branding */}
-        <div
-          className={`${styles.rightColumn} ${
-            backgroundLoaded ? styles.visible : ''
-          }`}
-          role="region"
-          aria-label="Branding section"
-        >
-          <div
-            className={styles.brandingContainer}
-            role="banner"
-            aria-labelledby="brand-title"
-          >
-            <picture>
-              <source srcSet={openstackLogoWebp} type="image/webp" />
-              <img
-                alt="Rackspace OpenStack logo"
-                className={styles.logo}
-                src={openstackLogoPng}
-              />
-            </picture>
-            <h2
-              id="brand-title"
-              className={styles.brandTitle}
-              aria-label="Rackspace OpenStack platform"
-            >
-              Rackspace OpenStack
-            </h2>
-            <p className={styles.brandSubtitle} aria-describedby="brand-title">
-              Powered by openCenter
-            </p>
-          </div>
-        </div>
-        {this.renderPublicBanners()}
+        </section>
       </div>
     );
   }

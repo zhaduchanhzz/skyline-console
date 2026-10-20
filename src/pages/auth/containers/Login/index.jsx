@@ -21,9 +21,7 @@ import SimpleForm from 'components/SimpleForm';
 import SelectLang from 'components/SelectLang';
 import globalSkylineStore from 'stores/skyline/skyline';
 import globalMessageBannerStore from 'stores/skyline/message-banner';
-import i18n from 'core/i18n';
 import { isEmpty } from 'lodash';
-import logo from 'asset/image/logo.png';
 import { setLocalStorageItem } from 'utils/local-storage';
 import {
   getConsoleMode,
@@ -100,25 +98,10 @@ export class Login extends Component {
     return this.props.rootStore;
   }
 
-  get info() {
-    const { info = {} } = this.rootStore;
-    return info || {};
-  }
-
   get productName() {
-    const {
-      product_name = {
-        zh: t('The Rackspace Cloud'),
-        en: 'The Rackspace Cloud',
-      },
-    } = this.info;
-    const { getLocaleShortName } = i18n;
-    const language = getLocaleShortName();
-    const name =
-      product_name[language] ||
-      t('The Rackspace Cloud') ||
-      'The Rackspace Cloud';
-    return t('Welcome to {name}', { name });
+    return t('Welcome to {name}', {
+      name: 'Sovereign Next-Generation Private Cloud Platform',
+    });
   }
 
   get regions() {
@@ -626,19 +609,6 @@ export class Login extends Component {
           role="article"
           aria-label="Login form container"
         >
-          {/* Fixed header section - Logo only */}
-          <div
-            className={styles.headerSection}
-            role="banner"
-            aria-label="Application header"
-          >
-            <img
-              alt="Application logo"
-              className={styles.headerLogo}
-              src={logo}
-            />
-          </div>
-
           {/* Language selector */}
           <div
             className={styles.langSelector}

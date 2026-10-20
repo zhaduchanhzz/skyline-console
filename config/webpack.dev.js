@@ -69,6 +69,9 @@ module.exports = (env) => {
     historyApiFallback: true,
     compress: true,
     hot: true,
+    client: {
+      overlay: { errors: true, warnings: false, runtimeErrors: false },
+    },
     devMiddleware: {
       stats: {
         children: false,

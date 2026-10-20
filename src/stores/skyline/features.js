@@ -29,7 +29,14 @@ export class FeatureStore {
       this.values = features;
       this.ready = true;
     } catch (error) {
-      this.error = true;
+      // The upstream Skyline API image has no optional /features
+      // route. An empty map keeps the console's default panel visibility.
+      if (error.response?.status === 404) {
+        this.values = {};
+        this.ready = true;
+      } else {
+        this.error = true;
+      }
     }
   }
 

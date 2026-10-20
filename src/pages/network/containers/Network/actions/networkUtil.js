@@ -78,7 +78,7 @@ const getDnsExtra = (ipVersion = 'ipv4', region) => {
   if (ipVersion !== 'ipv4') {
     return base;
   }
-  return t('{base}. Rackspace DNS servers for {region}: {rackspaceDns}.', {
+  return t('{base}. Default DNS servers for {region}: {rackspaceDns}.', {
     base,
     region: getRackspaceDnsRegion(region).toUpperCase(),
     rackspaceDns: getRackspaceDnsServers(region).join(', '),
