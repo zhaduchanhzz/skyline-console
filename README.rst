@@ -27,6 +27,9 @@ Getting Started for Developers
 `Development Guide <https://docs.openstack.org/skyline-console/latest/development/>`_
 describes how to setup Skyline development environment and start development.
 
+For a local console without OpenStack, see ``LOCAL_STANDALONE.md``. Run
+``npm run local`` and sign in with the local demo account described there.
+
 Building Contributor Documentation
 ==================================
 

@@ -22,9 +22,11 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 
 const common = require('./webpack.common');
 
-const server = require('./server.dev');
-
-const { getThemeConfig, getCustomStyleVariables } = require('./utils');
+const {
+  getServerConfig,
+  getThemeConfig,
+  getCustomStyleVariables,
+} = require('./utils');
 
 const theme = getThemeConfig();
 
@@ -32,7 +34,7 @@ console.log('theme', theme);
 
 const root = (path) => resolve(__dirname, `../${path}`);
 
-const { host, port, proxy } = server;
+const { host, port } = getServerConfig();
 
 module.exports = (env) => {
   const API = (env || {}).API || 'mock';
@@ -84,8 +86,21 @@ module.exports = (env) => {
     },
   };
 
-  if (API === 'mock' || API === 'dev') {
-    devServer.proxy = proxy;
+  if (API === 'local') {
+    // This mode serves a small, same-origin API for local UI development.
+    // Bind only to localhost because it uses the documented demo credentials.
+    devServer.host = '127.0.0.1';
+    devServer.port = Number(process.env.SKYLINE_LOCAL_PORT || 8089);
+    devServer.setupMiddlewares = (middlewares) => {
+      const { createStandaloneMock } = require('./standalone-mock');
+      middlewares.unshift({
+        name: 'standalone-mock',
+        middleware: createStandaloneMock(),
+      });
+      return middlewares;
+    };
+  } else if (API === 'mock' || API === 'dev') {
+    devServer.proxy = require('./server.dev').proxy;
   }
 
   const { version, ...restConfig } = common;
