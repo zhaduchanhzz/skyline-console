@@ -296,11 +296,31 @@ openstack flavor show project.2x4`}</CodeBlock>
           </tr>
           <tr>
             <td>
+              <code>hw:cpu_max_threads</code>, <code>hw:cpu_max_sockets</code>
+            </td>
+            <td>
+              Limit the guest CPU topology that an image or user can request.
+              These are maximum values, not a reservation of host threads or
+              sockets, and depend on the libvirt driver.
+            </td>
+          </tr>
+          <tr>
+            <td>
               <code>hw:numa_nodes</code>
             </td>
             <td>
               Requests a guest NUMA topology. CPU and memory must fit the host
               topology.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <code>hw:pci_numa_affinity_policy</code>
+            </td>
+            <td>
+              Controls the placement preference for PCI devices and SR-IOV
+              interfaces relative to guest CPUs. The preferred policy allows
+              fallback when a same-node device is unavailable.
             </td>
           </tr>
           <tr>
@@ -314,6 +334,15 @@ openstack flavor show project.2x4`}</CodeBlock>
           </tr>
           <tr>
             <td>
+              <code>hw:hide_hypervisor_id</code>
+            </td>
+            <td>
+              Optionally hides the hypervisor signature from a guest when a
+              driver requires it. Confirm the effect with the guest vendor.
+            </td>
+          </tr>
+          <tr>
+            <td>
               <code>trait:...</code> and <code>resources:...</code>
             </td>
             <td>
@@ -323,12 +352,24 @@ openstack flavor show project.2x4`}</CodeBlock>
           </tr>
           <tr>
             <td>
-              <code>quota:vif_*_average</code>
+              <code>:category</code>, <code>:architecture</code>
             </td>
             <td>
-              Legacy virtual interface bandwidth settings on deployments that
-              support them. Prefer your cloud&apos;s documented Neutron QoS
-              policy for network limits.
+              Optional console display metadata used by some deployments to
+              group flavors. These keys do not allocate hardware or change
+              placement by themselves.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <code>quota:vif_*_average</code>, <code>quota:vif_*_peak</code>,
+              <code>quota:vif_*_burst</code>
+            </td>
+            <td>
+              Libvirt virtual-interface traffic limits for inbound and outbound
+              directions where supported. Average and peak are in kilobytes per
+              second; burst is in kilobytes. A Neutron QoS policy may be the
+              appropriate control in other deployments.
             </td>
           </tr>
         </tbody>
@@ -349,6 +390,30 @@ openstack flavor unset --property hw:mem_page_size general.2x4`}</CodeBlock>
         settings in a flavor are deployment dependent and do not automatically
         reserve network capacity.
       </p>
+      <p>
+        To target a CPU vendor, an operator can attach a custom Placement trait
+        to the relevant compute providers and require that trait from a flavor.
+        The trait name below is an example; it works only after the operator has
+        created and assigned it. Older environments sometimes use
+        <code> capabilities:cpu_info:vendor</code> with a scheduler filter, but
+        that behavior is not guaranteed on modern clouds.
+      </p>
+      <CodeBlock>{`openstack flavor set general.2x4 \\
+  --property trait:CUSTOM_CPU_VENDOR_INTEL=required`}</CodeBlock>
+      <p>
+        If the deployment supports libvirt VIF quotas, all three limits can be
+        specified for each direction. In this illustration, sustained inbound
+        and outbound rates are 125000 kB/s, with 250000 kB/s peak and 250000 kB
+        burst allowances. Check the cloud&apos;s networking model before
+        applying these properties.
+      </p>
+      <CodeBlock>{`openstack flavor set general.2x4 \\
+  --property quota:vif_inbound_average=125000 \\
+  --property quota:vif_inbound_peak=250000 \\
+  --property quota:vif_inbound_burst=250000 \\
+  --property quota:vif_outbound_average=125000 \\
+  --property quota:vif_outbound_peak=250000 \\
+  --property quota:vif_outbound_burst=250000`}</CodeBlock>
 
       <h3>NUMA and huge pages</h3>
       <p>
@@ -367,6 +432,14 @@ openstack flavor set numa.8x32 \\
         memory configuration. Set <code>hw:mem_page_size</code> only after
         confirming that the host and guest support the requested size.
       </p>
+      <p>
+        PCI NUMA affinity is a separate choice from the number of guest NUMA
+        nodes. The preferred policy tries to keep a PCI device or SR-IOV
+        interface near the guest CPUs but can fall back to another node. Confirm
+        that the workload tolerates that possible performance change.
+      </p>
+      <CodeBlock>{`openstack flavor set numa.8x32 \\
+  --property hw:pci_numa_affinity_policy=preferred`}</CodeBlock>
 
       <h3>GPU and other PCI devices</h3>
       <p>
@@ -379,6 +452,23 @@ openstack flavor set numa.8x32 \\
   --vcpus 8 --ram 32768 --disk 80 --private
 openstack flavor set gpu.8x32 \\
   --property pci_passthrough:alias=gpu:1`}</CodeBlock>
+      <p>
+        Some guests require the hypervisor signature to be hidden before a
+        device driver will load. This is optional and should be tested with the
+        guest image, not enabled for every GPU flavor.
+      </p>
+      <CodeBlock>{`openstack flavor set gpu.8x32 \\
+  --property hw:hide_hypervisor_id=true`}</CodeBlock>
+
+      <h3>Why create custom flavors?</h3>
+      <p>
+        Matching sizes to workloads can reduce wasted CPU, RAM, and disk while
+        giving demanding services the resources they need. Fewer oversized
+        instances may reduce capacity use and cost. Specialized hardware
+        requests can improve performance, but they also narrow placement options
+        and increase operational complexity. Publish a small, clear catalog and
+        measure utilization before adding many near-duplicate sizes.
+      </p>
 
       <h3>Operational checks</h3>
       <ol>
@@ -540,6 +630,25 @@ qemu-img info ./guest-image.qcow2`}</CodeBlock>
           </tr>
           <tr>
             <td>
+              <code>img_config_drive</code>
+            </td>
+            <td>
+              Indicates whether a configuration drive is optional or required
+              for instance metadata delivery. Guest support is necessary.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <code>hypervisor_type</code>
+            </td>
+            <td>
+              Limits use to a compatible hypervisor type when the cloud
+              interprets this property. Do not set it merely because the image
+              file has a QCOW2 extension.
+            </td>
+          </tr>
+          <tr>
+            <td>
               <code>hw_qemu_guest_agent</code>
             </td>
             <td>
@@ -640,6 +749,24 @@ openstack image list --long`}</CodeBlock>
   --property os_distro=ubuntu \\
   --property os_admin_user=ubuntu
 openstack image show "Example Linux"`}</CodeBlock>
+      <p>
+        Add optional hardware properties only after verifying the image and
+        compute fleet. For example, a UEFI guest that includes the QEMU guest
+        agent and supports virtio multiqueue can use a profile like this:
+      </p>
+      <CodeBlock>{`openstack image set "Example Linux" \\
+  --property hw_qemu_guest_agent=yes \\
+  --property hw_vif_multiqueue_enabled=true \\
+  --property img_config_drive=optional \\
+  --property hw_machine_type=q35 \\
+  --property hw_firmware_type=uefi \\
+  --property os_require_quiesce=yes`}</CodeBlock>
+      <p>
+        Quiescing requires working guest integration and is useful for
+        consistent snapshots. A guest without UEFI support should not request
+        UEFI firmware. Disk bus, SCSI model, and hypervisor type can also be
+        specified when a cloud operator has validated those choices.
+      </p>
       <ol>
         <li>Wait until the image status is active.</li>
         <li>
@@ -660,8 +787,9 @@ openstack image show "Example Linux"`}</CodeBlock>
         Each command assumes that the named file has already been obtained from
         an approved source and verified. Filenames are examples. Replace the
         release number, format, architecture, and login property with the actual
-        values for your build. Administrative permission may be needed to upload
-        or publish images.
+        values for your build. Releases in these examples illustrate the
+        workflow; use a maintained version supported by your organization.
+        Administrative permission may be needed to upload or publish images.
       </p>
       {imageExamples.map((example) => (
         <section key={example.id} id={`image-${example.id}`}>
@@ -673,12 +801,18 @@ qemu-img info ./fedora-coreos-openstack.qcow2`}</CodeBlock>
           )}
           <CodeBlock>{imageCreateCommand(example)}</CodeBlock>
           {example.id === 'coreos' && (
-            <p>
-              Some Magnum cluster drivers require a specific{' '}
-              <code>os_distro</code> value such as <code>fedora-coreos</code>.
-              Confirm that requirement with the cluster operator and update the
-              property if needed.
-            </p>
+            <>
+              <p>
+                Some Magnum cluster drivers require a specific{' '}
+                <code>os_distro</code> value such as <code>fedora-coreos</code>.
+                Confirm that requirement with the cluster operator. The property
+                is case sensitive; apply it before creating a cluster template
+                that uses this image.
+              </p>
+              <CodeBlock>{`openstack image set "Fedora CoreOS" \\
+  --property os_distro=fedora-coreos
+openstack image show "Fedora CoreOS"`}</CodeBlock>
+            </>
           )}
         </section>
       ))}
@@ -692,14 +826,21 @@ qemu-img info ./fedora-coreos-openstack.qcow2`}</CodeBlock>
           Generalize the guest with Sysprep, shut it down, and capture the disk
           only after that final shutdown. Verify whether the resulting file is
           QCOW2 or RAW and declare the matching format. Check firmware mode and
-          licensing before distributing the image.
+          licensing before distributing the image. If the captured disk is RAW,
+          convert it to QCOW2 before using the following upload command. Choose
+          minimum disk and RAM values that meet the actual Windows build&apos;s
+          requirements; the values below are illustrative.
         </p>
-        <CodeBlock>{`qemu-img info ./windows-server.qcow2
+        <CodeBlock>{`qemu-img convert -p -f raw -O qcow2 \\
+  ./windows-server.raw ./windows-server.qcow2
+qemu-img info ./windows-server.qcow2
 openstack image create "Windows Server" \\
   --file ./windows-server.qcow2 \\
   --disk-format qcow2 --container-format bare --private \\
+  --min-disk 50 --min-ram 2048 \\
   --property os_type=windows \\
   --property os_distro=windows \\
+  --property os_version=2022 \\
   --property os_admin_user=Administrator
 openstack image show "Windows Server"`}</CodeBlock>
       </section>

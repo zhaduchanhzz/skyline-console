@@ -76,6 +76,20 @@ openstack --version`}</code>
           if a command or option is missing. Object storage and load-balancer
           operations may need the corresponding client plugin.
         </p>
+        <h3>Distribution packages</h3>
+        <p>
+          If you prefer the operating system package manager, install the
+          package for your platform. The exact package name and available
+          version depend on the distribution.
+        </p>
+        <pre>
+          <code>{`# Ubuntu or Debian
+sudo apt install python3-openstackclient
+# Fedora or Enterprise Linux
+sudo dnf install python3-openstackclient
+# macOS with Homebrew
+brew install openstackclient`}</code>
+        </pre>
         <h2>Next step</h2>
         <p>
           Obtain your cloud-specific <code>clouds.yaml</code> or application
@@ -111,6 +125,26 @@ openstack --os-cloud CLOUD project list
 openstack --os-cloud CLOUD region list
 openstack --os-cloud CLOUD flavor list`}</code>
         </pre>
+        <h2>Unscoped and project-scoped access</h2>
+        <p>
+          If you do not know which project to use, an operator can provide an
+          unscoped cloud profile so you can list the projects assigned to your
+          identity. Select one project in your normal profile, then issue a
+          scoped token. Do not place a token or password in a shared terminal
+          transcript.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud UNSCOPED project list
+openstack --os-cloud CLOUD token issue
+openstack --os-cloud CLOUD catalog list`}</code>
+        </pre>
+        <p>
+          <code>UNSCOPED</code> and <code>CLOUD</code> are separate profiles
+          supplied by the cloud operator. The scoped profile includes the
+          project and project domain; its token controls later resource
+          commands. In a federated environment, the authentication flow may
+          differ from password-based examples.
+        </p>
         <h2>Troubleshooting</h2>
         <ul>
           <li>
@@ -156,6 +190,19 @@ openstack --os-cloud CLOUD flavor list`}</code>
 openstack --os-cloud CLOUD security group rule create --ingress --protocol tcp --dst-port 443 --remote-ip 0.0.0.0/0 web
 openstack --os-cloud CLOUD security group rule list web`}</code>
         </pre>
+        <h3>Common ingress rules</h3>
+        <p>
+          Add HTTP only if the service accepts unencrypted traffic. Use an ICMP
+          rule for diagnostics, a UDP rule for a service such as DNS, or a
+          remote group when only ports attached to that group should connect.
+          The groups in these examples must already exist.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD security group rule create --ingress --protocol tcp --dst-port 80 --remote-ip 0.0.0.0/0 web
+openstack --os-cloud CLOUD security group rule create --ingress --protocol icmp --remote-ip 192.0.2.0/24 web
+openstack --os-cloud CLOUD security group rule create --ingress --protocol udp --dst-port 53 --remote-group dns-clients dns-servers
+openstack --os-cloud CLOUD security group rule create --ingress --protocol tcp --dst-port 3389 --remote-group admin-clients windows`}</code>
+        </pre>
         <p>
           For administration, restrict SSH to your office or VPN CIDR rather
           than the whole internet. Use a separate rule for IPv6 if the network
@@ -170,7 +217,9 @@ openstack --os-cloud CLOUD security group rule list web`}</code>
         <h2>Attach and remove</h2>
         <pre>
           <code>{`openstack --os-cloud CLOUD server add security group SERVER web
+openstack --os-cloud CLOUD security group rule show RULE_ID
 openstack --os-cloud CLOUD security group rule delete RULE_ID
+openstack --os-cloud CLOUD server remove security group SERVER web
 openstack --os-cloud CLOUD security group delete web`}</code>
         </pre>
         <p>
@@ -206,6 +255,39 @@ openstack --os-cloud CLOUD server add floating ip SERVER FLOATING_IP`}</code>
           floating IP status is active. If the server has several ports,
           associate the address with the intended port and fixed IP.
         </p>
+        <h2>Associate with a specific port</h2>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD port list --server SERVER
+openstack --os-cloud CLOUD floating ip set --port PORT_ID --fixed-ip-address FIXED_IP FLOATING_IP
+openstack --os-cloud CLOUD floating ip show FLOATING_IP
+openstack --os-cloud CLOUD floating ip unset --port FLOATING_IP`}</code>
+        </pre>
+        <p>
+          Use <code>--fixed-ip-address</code> when the port owns multiple fixed
+          addresses. Unsetting the port leaves the public address allocated to
+          the project.
+        </p>
+        <h2>Advanced: shared private VIP</h2>
+        <p>
+          Prefer a managed load balancer for a normal web service. A shared
+          virtual IP is useful when two network appliances manage failover
+          inside their guest operating systems. Reserve one private VIP on the
+          subnet, map a floating IP to that reservation, and allow both server
+          ports to use the VIP. The Neutron backend must support this design;
+          OVN deployments may require a single IP address rather than a CIDR in
+          each allowed-address pair.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD port create --network PRIVATE_NETWORK --fixed-ip subnet=PRIVATE_SUBNET,ip-address=PRIVATE_VIP vip-reservation
+openstack --os-cloud CLOUD floating ip create --port vip-reservation PUBLIC_NETWORK
+openstack --os-cloud CLOUD port set --allowed-address ip-address=PRIVATE_VIP SERVER_PORT_A
+openstack --os-cloud CLOUD port set --allowed-address ip-address=PRIVATE_VIP SERVER_PORT_B`}</code>
+        </pre>
+        <p>
+          Configure the VIP and failover software on the guest servers, then
+          test traffic while each server owns the address. The guest uses the
+          private VIP; the floating IP is translated at the network edge.
+        </p>
         <h2>Release</h2>
         <pre>
           <code>{`openstack --os-cloud CLOUD server remove floating ip SERVER FLOATING_IP
@@ -236,6 +318,17 @@ openstack --os-cloud CLOUD floating ip delete FLOATING_IP`}</code>
 openstack --os-cloud CLOUD keypair create --public-key ~/.ssh/cloud-admin.pub cloud-admin
 openstack --os-cloud CLOUD keypair list
 openstack --os-cloud CLOUD keypair show cloud-admin`}</code>
+        </pre>
+        <h2>Generate a key through OpenStack</h2>
+        <p>
+          Alternatively, ask the client to generate a key and write the private
+          part to a local file. Restrict that file to your user before using it
+          for SSH. Client support for key algorithms can differ by release.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD keypair create --private-key ./cloud-generated.pem cloud-generated
+chmod 600 ./cloud-generated.pem
+openstack --os-cloud CLOUD keypair show cloud-generated --public-key`}</code>
         </pre>
         <h2>Use the key when creating a server</h2>
         <p>
@@ -292,6 +385,40 @@ openstack --os-cloud CLOUD console log show app-01`}</code>
           with <code>--user-data FILE</code>. A config drive can expose metadata
           when the network metadata service is unavailable.
         </p>
+        <h2>Automate first boot</h2>
+        <p>
+          Save cloud-init instructions in a local file, then pass that file at
+          server creation. The image must include cloud-init for these
+          instructions to run. A config drive presents metadata locally when the
+          instance cannot reach the network metadata service.
+        </p>
+        <pre>
+          <code>{`#cloud-config
+packages:
+  - nginx
+runcmd:
+  - systemctl enable --now nginx`}</code>
+        </pre>
+        <pre>
+          <code>
+            openstack --os-cloud CLOUD server create --image IMAGE --flavor
+            FLAVOR --network NETWORK --key-name cloud-admin --user-data
+            ./user-data.yaml --use-config-drive --property role=web --wait
+            app-web
+          </code>
+        </pre>
+        <h2>Launch from existing storage</h2>
+        <p>
+          An instance snapshot that appears in Glance is selected as an image.
+          For a Cinder volume snapshot, first create a bootable volume from the
+          snapshot and launch with <code>--volume</code>. Confirm the snapshot
+          contains a bootable operating system.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD server create --image app-01-checkpoint --flavor FLAVOR --network NETWORK --wait app-restored
+openstack --os-cloud CLOUD volume create --snapshot BOOT_VOLUME_SNAPSHOT restored-boot
+openstack --os-cloud CLOUD server create --volume restored-boot --flavor FLAVOR --network NETWORK --wait app-from-volume`}</code>
+        </pre>
         <h2>Lifecycle</h2>
         <pre>
           <code>{`openstack --os-cloud CLOUD server stop app-01
@@ -325,6 +452,27 @@ openstack --os-cloud CLOUD router add subnet project-router private-subnet
 openstack --os-cloud CLOUD router set --external-gateway PUBLIC_NETWORK project-router
 openstack --os-cloud CLOUD router show project-router`}</code>
         </pre>
+        <h2>Inspect and update a router</h2>
+        <p>
+          List and describe the router after attaching a subnet. Use an extra
+          static route only when a reachable next hop exists on a connected
+          network.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD router list
+openstack --os-cloud CLOUD router set --description "Project egress" project-router
+openstack --os-cloud CLOUD router add route --route destination=10.30.0.0/24,gateway=10.20.0.254 project-router
+openstack --os-cloud CLOUD router show project-router`}</code>
+        </pre>
+        <p>
+          As an alternative to <code>router add subnet</code>, attach a
+          dedicated port. Use this form only when designing the router from the
+          start; do not attach both methods to the same subnet.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD port create --network private-net --fixed-ip subnet=private-subnet router-port
+openstack --os-cloud CLOUD router add port project-router router-port`}</code>
+        </pre>
         <h2>Check and remove connections</h2>
         <p>
           If an instance cannot reach outside its subnet, inspect its subnet
@@ -333,10 +481,17 @@ openstack --os-cloud CLOUD router show project-router`}</code>
           first remove attached subnet interfaces and its external gateway.
         </p>
         <pre>
-          <code>{`openstack --os-cloud CLOUD router remove subnet project-router private-subnet
+          <code>{`openstack --os-cloud CLOUD router remove route --route destination=10.30.0.0/24,gateway=10.20.0.254 project-router
+openstack --os-cloud CLOUD router remove subnet project-router private-subnet
 openstack --os-cloud CLOUD router unset --external-gateway project-router
 openstack --os-cloud CLOUD router delete project-router`}</code>
         </pre>
+        <p>
+          If you attached a port instead of the subnet, remove the port with{' '}
+          <code>openstack router remove port project-router router-port</code>{' '}
+          before clearing the gateway. A busy router cannot be deleted while
+          interfaces or gateway ports remain.
+        </p>
       </>
     ),
   },
@@ -367,6 +522,17 @@ openstack --os-cloud CLOUD image show IMAGE`}</code>
           <code>{`openstack --os-cloud CLOUD image create --private --disk-format qcow2 --container-format bare --file ./server.qcow2 app-image
 openstack --os-cloud CLOUD image show app-image`}</code>
         </pre>
+        <h2>Launch, export, and remove</h2>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD server create --image app-image --flavor FLAVOR --network NETWORK --wait image-test
+openstack --os-cloud CLOUD image save --file ./app-image.qcow2 app-image
+openstack --os-cloud CLOUD image delete app-image`}</code>
+        </pre>
+        <p>
+          Export may be restricted by image policy. Deleting an image does not
+          delete existing servers, but it prevents new launches from that image.
+          Verify the exported file before importing it elsewhere.
+        </p>
         <p>
           Images differ from instance and volume snapshots. See the{' '}
           <DocLink slug="images">image and Glance guide</DocLink> for additional
@@ -393,6 +559,59 @@ openstack --os-cloud CLOUD image show app-image`}</code>
 openstack --os-cloud CLOUD metric resource show RESOURCE_ID
 openstack --os-cloud CLOUD metric list
 openstack --os-cloud CLOUD metric measures show METRIC_ID`}</code>
+        </pre>
+        <h2>Create and manage a metric</h2>
+        <p>
+          Most resource metrics are created automatically by the telemetry
+          service. If your role permits custom metrics, select an existing
+          archive policy and associate a metric with a resource. Destructive
+          commands below are for resources you own, not platform-managed
+          telemetry. For the sample measure, replace <code>TIMESTAMP_UTC</code>{' '}
+          with a recent ISO 8601 UTC timestamp within the policy retention
+          window.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD metric archive-policy list
+openstack --os-cloud CLOUD metric create request_count --resource-id RESOURCE_ID --archive-policy-name POLICY --unit requests
+openstack --os-cloud CLOUD metric show request_count --resource-id RESOURCE_ID
+openstack --os-cloud CLOUD metric measures add --resource-id RESOURCE_ID --measure TIMESTAMP_UTC@1 request_count
+openstack --os-cloud CLOUD metric measures show request_count --resource-id RESOURCE_ID
+openstack --os-cloud CLOUD metric delete --resource-id RESOURCE_ID request_count`}</code>
+        </pre>
+        <h2>Resource records and types</h2>
+        <p>
+          Gnocchi resources provide identity and attributes for metrics.
+          Operators may define resource types; application users normally
+          inspect and update only records they own. Creating or deleting a
+          resource record can remove its associated time series. Replace{' '}
+          <code>RESOURCE_UUID</code> with a new UUID for a test resource.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD metric resource-type list
+openstack --os-cloud CLOUD metric resource-type show generic
+openstack --os-cloud CLOUD metric resource-type create --attribute display_name:string:false app-resource
+openstack --os-cloud CLOUD metric resource-type update --attribute owner:string:false app-resource
+openstack --os-cloud CLOUD metric resource create --type app-resource --attribute display_name:app-01 RESOURCE_UUID
+openstack --os-cloud CLOUD metric resource update --type app-resource --attribute display_name:app-02 RESOURCE_UUID
+openstack --os-cloud CLOUD metric resource show RESOURCE_UUID
+openstack --os-cloud CLOUD metric resource delete RESOURCE_UUID
+openstack --os-cloud CLOUD metric resource-type delete app-resource`}</code>
+        </pre>
+        <h2>Archive policies</h2>
+        <p>
+          A policy defines how many points are kept and their granularity.
+          Review an existing policy before creating a new one. Policy and
+          resource-type administration may require an elevated role; check
+          retention and storage cost with your operator. An archive policy can
+          be deleted only when no metrics use it.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD metric archive-policy list
+openstack --os-cloud CLOUD metric archive-policy show POLICY
+openstack --os-cloud CLOUD metric archive-policy create --definition granularity:60s,points:1440 app-one-day
+openstack --os-cloud CLOUD metric archive-policy update --definition granularity:60s,points:2880 app-one-day
+openstack --os-cloud CLOUD metric archive-policy show app-one-day
+openstack --os-cloud CLOUD metric archive-policy delete app-one-day`}</code>
         </pre>
         <h2>Read results carefully</h2>
         <p>
@@ -427,23 +646,52 @@ openstack --os-cloud CLOUD metric measures show METRIC_ID`}</code>
         <pre>
           <code>{`openstack --os-cloud CLOUD container create app-files
 openstack --os-cloud CLOUD container show app-files
-openstack --os-cloud CLOUD object create app-files ./report.pdf
+openstack --os-cloud CLOUD object create --name report.pdf app-files ./report.pdf
 openstack --os-cloud CLOUD object list app-files
 openstack --os-cloud CLOUD object save --file ./report-copy.pdf app-files report.pdf`}</code>
+        </pre>
+        <h2>Bulk files, prefixes, and metadata</h2>
+        <p>
+          Set each object name explicitly when uploading from a local path. A
+          slash in the object name creates a prefix, not a separate directory.
+          This CLI lists all objects in the container; the Swift CLI can filter
+          by prefix when the container is large.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD container list
+openstack --os-cloud CLOUD object create --name reports/january.csv app-files ./reports/january.csv
+openstack --os-cloud CLOUD object create --name reports/february.csv app-files ./reports/february.csv
+openstack --os-cloud CLOUD object list app-files
+openstack --os-cloud CLOUD object set --property owner=finance app-files reports/january.csv
+openstack --os-cloud CLOUD object show app-files reports/january.csv
+openstack --os-cloud CLOUD object unset --property owner app-files reports/january.csv`}</code>
         </pre>
         <p>
           Keep containers private unless public read access is intentional.
           Download a sample object after uploading to verify that clients have
           access and that file contents are intact.
         </p>
+        <p>
+          If public distribution is required and approved for the entire
+          container, create it with <code>--public</code>. An existing private
+          container should remain private while you test access. Use the Swift
+          client for object expiration controls.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD container create --public public-assets
+openstack --os-cloud CLOUD container show public-assets`}</code>
+        </pre>
         <h2>Cleanup</h2>
         <pre>
-          <code>{`openstack --os-cloud CLOUD object delete app-files report.pdf
-openstack --os-cloud CLOUD container delete app-files`}</code>
+          <code>{`openstack --os-cloud CLOUD object delete app-files report.pdf reports/january.csv reports/february.csv
+openstack --os-cloud CLOUD container delete app-files
+openstack --os-cloud CLOUD container delete public-assets`}</code>
         </pre>
         <p>
           Delete objects before deleting the container. A failed delete commonly
-          means objects remain or your token lacks permission.
+          means objects remain or your token lacks permission. The optional{' '}
+          <code>--recursive</code> flag deletes every object in the container as
+          well as the container, so verify the target before using it.
         </p>
       </>
     ),
@@ -465,10 +713,24 @@ openstack --os-cloud CLOUD container delete app-files`}</code>
           <code>{`python -m pip install python-swiftclient
 swift stat
 swift post app-files
-swift upload app-files ./report.pdf
+swift upload app-files report.pdf
 swift list app-files
-swift download app-files report.pdf`}</code>
+swift download app-files report.pdf --output ./report-copy.pdf`}</code>
         </pre>
+        <h2>Directories and prefixes</h2>
+        <pre>
+          <code>{`swift upload app-files reports/
+swift list app-files --prefix reports/
+swift download app-files --prefix reports/ --output-dir ./downloaded
+swift stat app-files report.pdf
+swift stat app-files reports/january.csv`}</code>
+        </pre>
+        <p>
+          The directory name becomes part of each object key. Confirm a prefix
+          selection before bulk download or deletion. The{' '}
+          <code>swift delete CONTAINER</code> form can remove the container and
+          its contents; use it only after checking the object list.
+        </p>
         <h2>Metadata and expiration</h2>
         <p>
           Swift can store metadata on a container or object. Object expiration
@@ -478,11 +740,30 @@ swift download app-files report.pdf`}</code>
         </p>
         <pre>
           <code>{`swift post app-files report.pdf -H "X-Delete-After:86400"
+swift post app-files report.pdf -H "X-Delete-At:UNIX_EPOCH_SECONDS"
+swift post app-files report.pdf -H "X-Remove-Delete-At:"
 swift stat app-files report.pdf`}</code>
         </pre>
         <p>
+          Use either a relative number of seconds or an absolute Unix epoch time
+          for one object. The <code>X-Remove-Delete-At</code> header clears a
+          scheduled expiration. Run these commands as alternatives, not as a
+          single sequence. Metadata behavior may depend on the Swift proxy
+          configuration; inspect the object after each change.
+        </p>
+        <p>
           Do not make a container public merely to test a download. Public read
           access can expose every object inside it.
+        </p>
+        <h2>Cleanup</h2>
+        <pre>
+          <code>{`swift delete app-files report.pdf reports/january.csv reports/february.csv
+swift delete app-files`}</code>
+        </pre>
+        <p>
+          List the container before deleting it. A container-only delete can
+          remove any remaining objects, including ones not shown in these
+          examples.
         </p>
       </>
     ),
@@ -502,14 +783,24 @@ swift stat app-files report.pdf`}</code>
           protected CLI profile.
         </p>
         <pre>
-          <code>{`openstack --os-cloud CLOUD ec2 credentials create
+          <code>{`python -m pip install awscli
+openstack --os-cloud CLOUD ec2 credentials create
 aws configure --profile sovereign-object`}</code>
         </pre>
+        <p>
+          The credential output includes an access key and secret. Copy them
+          into the protected profile when prompted; never commit the profile or
+          include these values in screenshots. In the profile, set the region
+          supplied by the operator. The endpoint is passed explicitly in the
+          commands below, so no provider-specific plugin is required.
+        </p>
         <h2>Validate the endpoint</h2>
         <pre>
           <code>{`aws --profile sovereign-object --endpoint-url S3_ENDPOINT s3api list-buckets
 aws --profile sovereign-object --endpoint-url S3_ENDPOINT s3api create-bucket --bucket app-archive
-aws --profile sovereign-object --endpoint-url S3_ENDPOINT s3 cp ./report.pdf s3://app-archive/report.pdf`}</code>
+aws --profile sovereign-object --endpoint-url S3_ENDPOINT s3 cp ./report.pdf s3://app-archive/report.pdf
+aws --profile sovereign-object --endpoint-url S3_ENDPOINT s3 ls s3://app-archive/
+aws --profile sovereign-object --endpoint-url S3_ENDPOINT s3 cp s3://app-archive/report.pdf ./downloaded-report.pdf`}</code>
         </pre>
         <p>
           Replace <code>S3_ENDPOINT</code> with the endpoint for your cloud; it
@@ -543,6 +834,13 @@ aws --profile sovereign-object --endpoint-url S3_ENDPOINT s3 cp ./report.pdf s3:
           download or delete it, and confirm the operation has completed before
           leaving the page. Some console versions upload files only, not
           complete local directory trees.
+        </p>
+        <p>
+          Container details show visibility and object counts. If your
+          deployment supports changing visibility after creation, use the
+          container Update action and confirm the access setting. A public
+          container can expose every object it contains. Object expiration is
+          generally configured with the Swift CLI rather than this view.
         </p>
         <p>
           Empty a container before deleting it. For bulk transfer, automatic
@@ -607,6 +905,38 @@ aws --profile sovereign-object --endpoint-url S3_ENDPOINT s3 cp ./report.pdf s3:
           the exact features your software uses, such as multipart uploads and
           signed URLs.
         </p>
+        <h2>Python S3 SDK example</h2>
+        <p>
+          A compatible endpoint can be used with <code>boto3</code>. Inject
+          endpoint and credentials through your application runtime rather than
+          hard-coding them. The bucket must already exist or the caller must
+          have permission to create it.
+        </p>
+        <pre>
+          <code>{`import os
+import boto3
+
+s3 = boto3.client(
+    "s3",
+    endpoint_url=os.environ["S3_ENDPOINT"],
+    region_name=os.environ["S3_REGION"],
+    aws_access_key_id=os.environ["S3_ACCESS_KEY"],
+    aws_secret_access_key=os.environ["S3_SECRET_KEY"],
+)
+s3.upload_file("report.pdf", "app-archive", "report.pdf")
+print(s3.list_objects_v2(Bucket="app-archive", Prefix="report"))`}</code>
+        </pre>
+        <h2>Bulk synchronization</h2>
+        <p>
+          Rclone can synchronize a local directory with a Swift or S3-compatible
+          remote. Configure the remote interactively, then test with a copy
+          before using a mirror operation that can delete destination files.
+        </p>
+        <pre>
+          <code>{`rclone config
+rclone copy ./reports sovereign-object:app-archive/reports
+rclone ls sovereign-object:app-archive/reports`}</code>
+        </pre>
       </>
     ),
   },
@@ -626,7 +956,7 @@ aws --profile sovereign-object --endpoint-url S3_ENDPOINT s3 cp ./report.pdf s3:
         <h2>Instance snapshot</h2>
         <pre>
           <code>{`openstack --os-cloud CLOUD server stop app-01
-openstack --os-cloud CLOUD server image create --name app-01-checkpoint app-01
+openstack --os-cloud CLOUD server image create --name app-01-checkpoint --wait app-01
 openstack --os-cloud CLOUD image show app-01-checkpoint
 openstack --os-cloud CLOUD server start app-01`}</code>
         </pre>
@@ -635,15 +965,44 @@ openstack --os-cloud CLOUD server start app-01`}</code>
           server may need separate volume snapshots to protect all of its data;
           check the boot source and attached volumes.
         </p>
-        <h2>Volume snapshot</h2>
+        <h2>Inspect, export, and import an instance snapshot</h2>
+        <p>
+          The server snapshot is an image. Inspect its status and disk format
+          before export. Image download may be disabled by policy. Copy the
+          exported file to the destination cloud through an approved transfer
+          method, then declare its actual format during import.
+        </p>
         <pre>
-          <code>{`openstack --os-cloud CLOUD volume snapshot create --volume data-01 data-01-checkpoint
-openstack --os-cloud CLOUD volume snapshot show data-01-checkpoint`}</code>
+          <code>{`openstack --os-cloud SOURCE image show app-01-checkpoint
+openstack --os-cloud SOURCE image save --file ./app-01-checkpoint.img app-01-checkpoint
+openstack --os-cloud DESTINATION image create --private --disk-format ACTUAL_FORMAT --container-format bare --file ./app-01-checkpoint.img app-01-restored
+openstack --os-cloud DESTINATION image show app-01-restored
+openstack --os-cloud DESTINATION server create --image app-01-restored --flavor FLAVOR --network NETWORK --wait restored-app`}</code>
         </pre>
         <p>
-          To move an image between clouds, export and import it only if policy
-          permits and verify its actual disk format before upload. Test a
-          restore before treating a snapshot as a recovery plan.
+          <code>ACTUAL_FORMAT</code> must match the exported image metadata and
+          bytes, for example <code>raw</code> or <code>qcow2</code>. Confirm the
+          destination has suitable network, flavor, key, and security-group
+          resources. Test application recovery after boot.
+        </p>
+        <h2>Volume snapshot</h2>
+        <p>
+          The example volume is attached to a server, so quiesce application
+          writes before taking its snapshot. On older Block Storage API
+          microversions, <code>--force</code> permits an attached volume to be
+          snapshotted when the backend supports it. Confirm the snapshot reaches{' '}
+          <code>available</code> before restoring it.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD volume snapshot create --force --volume data-01 data-01-checkpoint
+openstack --os-cloud CLOUD volume snapshot show data-01-checkpoint
+openstack --os-cloud CLOUD volume create --snapshot data-01-checkpoint restored-data`}</code>
+        </pre>
+        <p>
+          The restored volume inherits the snapshot size when no size is
+          supplied. If a larger size is requested, it must be at least as large
+          as the source volume. Test a restore before treating a snapshot as a
+          recovery plan.
         </p>
       </>
     ),
@@ -673,6 +1032,11 @@ openstack --os-cloud CLOUD server add volume app-01 data-01`}</code>
           persistent mount configuration because device names can change.
           Unmount and flush writes before detaching a data volume.
         </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD server volume list app-01
+openstack --os-cloud CLOUD server remove volume app-01 data-01
+openstack --os-cloud CLOUD volume show data-01`}</code>
+        </pre>
         <h2>Boot from volume</h2>
         <pre>
           <code>{`openstack --os-cloud CLOUD volume create --image IMAGE --size 20 app-boot
@@ -702,9 +1066,9 @@ openstack --os-cloud CLOUD server create --volume app-boot --flavor FLAVOR --net
         <h2>Create and inspect</h2>
         <pre>
           <code>{`openstack --os-cloud CLOUD loadbalancer create --name app-lb --vip-subnet-id PRIVATE_SUBNET --wait
-openstack --os-cloud CLOUD loadbalancer listener create --name app-http --protocol HTTP --protocol-port 80 app-lb
-openstack --os-cloud CLOUD loadbalancer pool create --name app-pool --protocol HTTP --lb-algorithm ROUND_ROBIN --listener app-http
-openstack --os-cloud CLOUD loadbalancer member create --subnet-id PRIVATE_SUBNET --address BACKEND_IP --protocol-port 8080 app-pool
+openstack --os-cloud CLOUD loadbalancer listener create --name app-http --protocol HTTP --protocol-port 80 --wait app-lb
+openstack --os-cloud CLOUD loadbalancer pool create --name app-pool --protocol HTTP --lb-algorithm ROUND_ROBIN --listener app-http --wait
+openstack --os-cloud CLOUD loadbalancer member create --subnet-id PRIVATE_SUBNET --address BACKEND_IP --protocol-port 8080 --wait app-pool
 openstack --os-cloud CLOUD loadbalancer show app-lb`}</code>
         </pre>
         <p>
@@ -713,12 +1077,37 @@ openstack --os-cloud CLOUD loadbalancer show app-lb`}</code>
           according to your cloud&apos;s network design. Wait for provisioning
           status <code>ACTIVE</code> between dependent changes.
         </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD loadbalancer healthmonitor create --name app-health --delay 5 --timeout 3 --max-retries 3 --type HTTP --url-path /health --wait app-pool
+openstack --os-cloud CLOUD loadbalancer list
+openstack --os-cloud CLOUD loadbalancer listener list
+openstack --os-cloud CLOUD loadbalancer pool list
+openstack --os-cloud CLOUD loadbalancer member list app-pool
+openstack --os-cloud CLOUD loadbalancer healthmonitor show app-health`}</code>
+        </pre>
+        <h2>Update a service</h2>
+        <p>
+          Change one component at a time, then wait for the load balancer to
+          return to <code>ACTIVE</code> before making another change. Adjust a
+          listener limit or add another healthy backend as demand grows.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD loadbalancer listener set --connection-limit 100 --wait app-http
+openstack --os-cloud CLOUD loadbalancer member create --subnet-id PRIVATE_SUBNET --address SECOND_BACKEND_IP --protocol-port 8080 --wait app-pool
+openstack --os-cloud CLOUD loadbalancer show app-lb`}</code>
+        </pre>
         <h2>Cleanup</h2>
         <p>
-          Remove listeners, pools, and members in dependency order, or use
-          cascading deletion if your deployment supports it. Inspect the
-          associated VIP port and floating IP before releasing them.
+          Remove an individual member when retiring a backend. To delete the
+          whole service, inspect the associated VIP port and floating IP,
+          release a separately allocated floating IP, and use cascading deletion
+          only if your deployment supports it. Cascading deletion removes the
+          listener, pool, monitor, and members too.
         </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD loadbalancer member delete --wait app-pool MEMBER_ID
+openstack --os-cloud CLOUD loadbalancer delete --cascade --wait app-lb`}</code>
+        </pre>
       </>
     ),
   },
@@ -753,10 +1142,31 @@ openstack --os-cloud CLOUD subnet show private-subnet`}</code>
           <code>{`openstack --os-cloud CLOUD port list --network private-net
 openstack --os-cloud CLOUD router add subnet project-router private-subnet`}</code>
         </pre>
+        <h2>Inspect and update</h2>
+        <p>
+          List networks, subnets, and ports in the current project and region.
+          Network descriptions can help distinguish workloads. Changing DHCP,
+          gateway, or DNS settings on an active subnet can interrupt existing
+          guests; review the impact before changing them.
+        </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD network list
+openstack --os-cloud CLOUD subnet list --network private-net
+openstack --os-cloud CLOUD port list --network private-net
+openstack --os-cloud CLOUD network set --description "Private application network" private-net
+openstack --os-cloud CLOUD network show private-net`}</code>
+        </pre>
+        <h2>Remove a network</h2>
         <p>
           Delete dependent servers, ports, and router interfaces before removing
-          a subnet or network.
+          a subnet or network. These commands permanently remove the subnet and
+          network after the application no longer needs them.
         </p>
+        <pre>
+          <code>{`openstack --os-cloud CLOUD router remove subnet project-router private-subnet
+openstack --os-cloud CLOUD subnet delete private-subnet
+openstack --os-cloud CLOUD network delete private-net`}</code>
+        </pre>
       </>
     ),
   },
