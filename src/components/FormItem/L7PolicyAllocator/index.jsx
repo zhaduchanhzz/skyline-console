@@ -14,20 +14,23 @@
 import React from 'react';
 import { Form, Button, Row, Col } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import i18n from 'core/i18n';
 import L7PolicyItem from './L7PolicyItem';
+
+const { t } = i18n;
 
 const L7PolicyAllocator = ({ formItemProps }) => {
   const { name } = formItemProps;
 
   return (
     <div style={{ padding: 20 }}>
-      <Form.Item label="Layer 7 Policies">
+      <Form.Item label={t('Layer 7 Policies')}>
         <Form.List name={name}>
           {(fields, { add, remove }) => (
             <>
               {fields.length === 0 && (
                 <div style={{ marginBottom: 12, color: '#888' }}>
-                  No policies configured.
+                  {t('No policies configured.')}
                 </div>
               )}
 
@@ -41,7 +44,7 @@ const L7PolicyAllocator = ({ formItemProps }) => {
                           validator: async (_, value) => {
                             if (!value?.action) {
                               return Promise.reject(
-                                new Error('Action is required')
+                                new Error(t('Action is required'))
                               );
                             }
 
@@ -54,8 +57,8 @@ const L7PolicyAllocator = ({ formItemProps }) => {
                               return Promise.reject(
                                 new Error(
                                   value.action === 'REDIRECT_TO_URL'
-                                    ? 'Redirect URL is required'
-                                    : 'Redirect Pool ID is required'
+                                    ? t('Redirect URL is required')
+                                    : t('Redirect Pool ID is required')
                                 )
                               );
                             }
@@ -67,7 +70,7 @@ const L7PolicyAllocator = ({ formItemProps }) => {
                               (!value.rules || value.rules.length === 0)
                             ) {
                               return Promise.reject(
-                                new Error('At least one rule is required')
+                                new Error(t('At least one rule is required'))
                               );
                             }
 
@@ -99,7 +102,7 @@ const L7PolicyAllocator = ({ formItemProps }) => {
                 block
                 style={{ marginTop: 16 }}
               >
-                Add Policy
+                {t('Add Policy')}
               </Button>
             </>
           )}

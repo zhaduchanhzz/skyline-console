@@ -14,6 +14,9 @@
 
 import React from 'react';
 import { Icon, Modal } from 'antd';
+import i18n from 'core/i18n';
+
+const { t } = i18n;
 
 const Loading = ({ pastDelay, timedOut, error }) => {
   if (pastDelay) {
@@ -31,15 +34,15 @@ const Loading = ({ pastDelay, timedOut, error }) => {
           style={{ fontSize: 32, color: globalCSS.primaryColor }}
           theme="outlined"
         />
-        <p>Loading...</p>
+        <p>{t('Loading...')}</p>
       </Modal>
     );
   }
   if (timedOut) {
-    return <div>Taking a long time...</div>;
+    return <div>{t('Taking a long time...')}</div>;
   }
   if (error) {
-    return <div>Error!</div>;
+    return <div>{t('Error!')}</div>;
   }
   return null;
 };

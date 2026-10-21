@@ -122,11 +122,11 @@ export class AuthLayout extends Component {
       <div
         className={styles.container}
         role="main"
-        aria-label="Authentication page"
+        aria-label={t('Authentication page')}
       >
         <section
           className={styles.visualPanel}
-          aria-label="Sovereign Next cloud illustration"
+          aria-label={t('Sovereign Next Cloud illustration')}
         >
           <SovereignBackground />
           <div
@@ -144,12 +144,15 @@ export class AuthLayout extends Component {
           </div>
         </section>
 
-        <section className={styles.formPanel} aria-label="Login form section">
+        <section
+          className={styles.formPanel}
+          aria-label={t('Login form section')}
+        >
           {this.renderPublicBanners()}
           <div
             className={styles.cardContainer}
             role="form"
-            aria-label="User authentication form"
+            aria-label={t('User authentication form')}
           >
             {renderRoutes(this.routes)}
           </div>

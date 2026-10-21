@@ -6,7 +6,7 @@ const MODULES = [
   {
     id: 'network',
     label: 'Networking',
-    ariaLabel: 'Networking and API gateway',
+    ariaLabel: () => t('Networking and API gateway'),
     iconCenter: [648, 421],
     iconPath:
       'M 647 389 C 666 389 680 405 680 422 C 680 440 666 454 648 454 C 630 454 616 441 616 422 C 616 405 629 389 647 389 Z',
@@ -15,7 +15,7 @@ const MODULES = [
   {
     id: 'k8s',
     label: 'Kubernetes',
-    ariaLabel: 'Kubernetes and containers',
+    ariaLabel: () => t('Kubernetes and containers'),
     iconCenter: [798, 186],
     iconPath:
       'M 786 155 L 813 160 L 829 184 L 822 208 L 798 216 L 771 204 L 765 179 Z',
@@ -23,8 +23,8 @@ const MODULES = [
   },
   {
     id: 'vm',
-    label: 'Virtual Machines',
-    ariaLabel: 'Virtual machines and compute',
+    label: 'VM',
+    ariaLabel: () => t('VM and compute'),
     iconCenter: [1396, 178],
     iconPath:
       'M 1388 116 L 1438 136 L 1439 210 L 1429 225 L 1395 242 L 1350 222 L 1350 165 L 1360 156 L 1360 136 Z',
@@ -33,7 +33,7 @@ const MODULES = [
   {
     id: 'storage',
     label: 'Storage',
-    ariaLabel: 'Database and storage',
+    ariaLabel: () => t('Database and storage'),
     iconCenter: [1542, 406],
     iconPath:
       'M 1526 355 C 1553 352 1562 367 1562 385 L 1562 409 L 1588 413 L 1589 449 L 1562 463 L 1524 451 C 1512 446 1500 439 1500 426 L 1500 378 C 1500 365 1510 357 1526 355 Z',
@@ -42,7 +42,7 @@ const MODULES = [
   {
     id: 'security',
     label: 'Security',
-    ariaLabel: 'Security and firewall',
+    ariaLabel: () => t('Security and firewall'),
     iconCenter: [1447, 639],
     iconPath:
       'M 1445 590 C 1464 601 1478 600 1490 606 L 1487 647 C 1483 667 1464 681 1447 688 C 1421 676 1409 658 1406 636 L 1406 606 C 1423 606 1434 600 1445 590 Z',
@@ -51,7 +51,7 @@ const MODULES = [
   {
     id: 'monitoring',
     label: 'Monitoring',
-    ariaLabel: 'Monitoring and analytics',
+    ariaLabel: () => t('Monitoring and analytics'),
     iconCenter: [958, 688],
     iconPath: 'M 901 632 L 974 650 L 1019 668 L 1024 722 L 972 751 L 899 720 Z',
     labelPosition: [936, 600],
@@ -120,7 +120,7 @@ export default class SovereignBackground extends Component {
         data-scene-target={module.id}
         role="button"
         tabIndex="0"
-        aria-label={module.ariaLabel}
+        aria-label={module.ariaLabel()}
         aria-pressed={pinnedTarget === module.id}
         onPointerEnter={() => this.activate(module.id)}
         onPointerLeave={this.restorePinned}
@@ -151,7 +151,7 @@ export default class SovereignBackground extends Component {
           viewBox={compact ? '640 0 1020 921' : '0 0 1708 921'}
           preserveAspectRatio={compact ? 'xMidYMid slice' : 'xMidYMid meet'}
           role="group"
-          aria-label="Interactive Sovereign cloud infrastructure"
+          aria-label={t('Interactive Sovereign Cloud infrastructure')}
           onPointerDown={this.clearPinnedOnBackground}
         >
           <defs>

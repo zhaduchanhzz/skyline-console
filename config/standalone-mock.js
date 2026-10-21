@@ -113,6 +113,9 @@ const makeProfile = (token) => {
 };
 
 const readService = (path) => {
+  if (/^\/api\/openstack\/keystone\/v3\/projects\/[^/]+\/tags$/.test(path)) {
+    return { tags: [] };
+  }
   if (
     /^\/api\/openstack\/keystone\/v3\/system\/users\/[^/]+\/roles$/.test(path)
   ) {

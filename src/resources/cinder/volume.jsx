@@ -178,7 +178,7 @@ export const volumeColumns = [
       if (value && value.length > 0) {
         return value.map((it) => (
           <div key={it.server_id}>
-            {it.device} on {it.server_name}
+            {it.device} {t('on')} {it.server_name}
           </div>
         ));
       }
@@ -318,7 +318,7 @@ export const getVolumeColumnsList = (self) => {
         if (value && value.length > 0) {
           return value.map((it) => (
             <div key={it.server_id}>
-              {it.device} on{' '}
+              {it.device} {t('on')}{' '}
               {self.getLinkRender(
                 'instanceDetail',
                 it.server_name || it.server_id,
@@ -335,7 +335,7 @@ export const getVolumeColumnsList = (self) => {
           return value
             .map((it) => {
               const { device, server_name, server_id } = it;
-              return `${device} on ${server_name || '-'}(${server_id})`;
+              return `${device} ${t('on')} ${server_name || '-'}(${server_id})`;
             })
             .join(',');
         }

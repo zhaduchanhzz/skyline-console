@@ -229,7 +229,9 @@ export class Login extends Component {
           id="login-error"
         >
           <InfoCircleFilled aria-hidden="true" />
-          <span aria-label="Login error message">{this.getErrorMessage()}</span>
+          <span aria-label={t('Login error message')}>
+            {this.getErrorMessage()}
+          </span>
         </div>
       ),
     };
@@ -297,7 +299,7 @@ export class Login extends Component {
         <Row
           gutter={8}
           role="navigation"
-          aria-label="Additional authentication options"
+          aria-label={t('Additional authentication options')}
         >
           <Col span={12}>
             <Link
@@ -607,13 +609,13 @@ export class Login extends Component {
         <div
           className={styles.loginContainer}
           role="article"
-          aria-label="Login form container"
+          aria-label={t('Login form container')}
         >
           {/* Language selector */}
           <div
             className={styles.langSelector}
             role="region"
-            aria-label="Language selection"
+            aria-label={t('Language selection')}
           >
             <SelectLang />
           </div>
@@ -624,7 +626,7 @@ export class Login extends Component {
             className={scrollableClass}
             onKeyDown={(e) => e.key === 'Enter' && this.handleSubmit()}
           >
-            <div role="main" aria-label="Login form content">
+            <div role="main" aria-label={t('Login form content')}>
               <h1
                 className={styles.welcomeMessage}
                 id="login-title"

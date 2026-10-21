@@ -132,8 +132,14 @@ export class ProjectDropdown extends React.Component {
 
     const tooltipTitle = (
       <>
-        <div>Project Name: {projectName}</div>
-        {userDomainName && <div>Domain: {userDomainName}</div>}
+        <div>
+          {t('Project Name')}: {projectName}
+        </div>
+        {userDomainName && (
+          <div>
+            {t('Domain')}: {userDomainName}
+          </div>
+        )}
         <div className={styles['project-tooltip-hint']}>
           {t('Click to switch project')}
         </div>

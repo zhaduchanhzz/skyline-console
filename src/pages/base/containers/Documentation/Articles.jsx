@@ -117,8 +117,8 @@ export function FlavorArticle() {
         A flavor describes the virtual CPU, memory, and disk resources offered
         to a new instance. Operators can also attach extra specifications that
         affect placement or hardware behavior. The flavors visible in your
-        console are supplied by your connected OpenStack cloud; no particular
-        set of sizes is guaranteed by this guide.
+        console are supplied by the cloud connected to your console; no
+        particular set of sizes is guaranteed by this guide.
       </p>
 
       <h3>Understand a flavor before selecting it</h3>

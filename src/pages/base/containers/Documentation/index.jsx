@@ -6,8 +6,10 @@ import {
   BookOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
+import i18n from 'core/i18n';
 import { FlavorArticle, ImageArticle } from './Articles';
 import { onboardingTopics } from './Onboarding';
+import { localizeNode, localizeText } from './localize';
 import { getDocsRoot, topicPath } from './paths';
 import styles from './style.less';
 
@@ -40,10 +42,88 @@ const sections = [
   { title: 'Cloud onboarding', topics: cloudTopics },
   { title: 'Technical guides', topics: referenceTopics },
 ];
-const allTopics = sections.reduce(
-  (items, section) => items.concat(section.topics),
-  []
-);
+const copy = {
+  en: {
+    start: 'Start here',
+    onboarding: 'Cloud onboarding',
+    technical: 'Technical guides',
+    helpCenter: 'Help center',
+    documentation: 'Documentation',
+    tagline: 'Everything you need to build and operate your private cloud.',
+    find: 'Find a guide',
+    topics: 'Documentation topics',
+    overview: 'Overview',
+    noMatches: 'No matching guides.',
+    explore: 'Explore the platform',
+    getStarted: 'Get started with your cloud',
+    intro:
+      'Follow the onboarding guides, then use the reference guides when choosing resources for an instance.',
+    missing: 'Guide not found',
+    missingDetails: 'The requested documentation page is not available.',
+    browse: 'Browse documentation',
+    more: 'More guides',
+    previous: 'Previous',
+    next: 'Next',
+    onPage: 'On this page',
+    read: 'Read guide',
+  },
+  vi: {
+    start: 'Bắt đầu',
+    onboarding: 'Hướng dẫn Cloud',
+    technical: 'Hướng dẫn kỹ thuật',
+    helpCenter: 'Trung tâm trợ giúp',
+    documentation: 'Tài liệu',
+    tagline: 'Tài liệu để xây dựng và vận hành Private Cloud của bạn.',
+    find: 'Tìm hướng dẫn',
+    topics: 'Chủ đề tài liệu',
+    overview: 'Tổng quan',
+    noMatches: 'Không tìm thấy hướng dẫn phù hợp.',
+    explore: 'Khám phá nền tảng',
+    getStarted: 'Bắt đầu với Cloud của bạn',
+    intro:
+      'Làm theo các hướng dẫn ban đầu, sau đó tham khảo hướng dẫn kỹ thuật khi chọn tài nguyên cho Instance.',
+    missing: 'Không tìm thấy hướng dẫn',
+    missingDetails: 'Trang tài liệu bạn yêu cầu hiện không có.',
+    browse: 'Xem tài liệu',
+    more: 'Hướng dẫn khác',
+    previous: 'Trước',
+    next: 'Tiếp',
+    onPage: 'Trong trang này',
+    read: 'Đọc hướng dẫn',
+  },
+  'zh-hans': {
+    start: '从这里开始',
+    onboarding: 'Cloud 入门',
+    technical: '技术指南',
+    helpCenter: '帮助中心',
+    documentation: '文档',
+    tagline: '构建和运维 Private Cloud 所需的指南。',
+    find: '搜索指南',
+    topics: '文档主题',
+    overview: '概览',
+    noMatches: '没有匹配的指南。',
+    explore: '探索平台',
+    getStarted: '开始使用 Cloud',
+    intro: '先阅读入门指南，再使用技术指南为 Instance 选择资源。',
+    missing: '未找到指南',
+    missingDetails: '请求的文档页面不可用。',
+    browse: '浏览文档',
+    more: '更多指南',
+    previous: '上一篇',
+    next: '下一篇',
+    onPage: '本页内容',
+    read: '阅读指南',
+  },
+};
+
+function TopicContent({ topic, locale }) {
+  const { content } = topic;
+  const rendered =
+    content.type === FlavorArticle || content.type === ImageArticle
+      ? content.type(content.props)
+      : content;
+  return localizeNode(rendered, locale);
+}
 
 function makeId(value) {
   return value
@@ -66,41 +146,61 @@ function TopicLink({ topic, currentSlug }) {
   );
 }
 
-function TopicCard({ topic }) {
+function TopicCard({ topic, readLabel }) {
   return (
     <Link className={styles['topic-card']} to={topicPath(topic.slug)}>
       <BookOutlined className={styles['topic-card-icon']} />
       <span className={styles['topic-card-title']}>{topic.title}</span>
       <span className={styles['topic-card-summary']}>{topic.summary}</span>
       <span className={styles['topic-card-action']}>
-        Read guide <ArrowRightOutlined />
+        {readLabel} <ArrowRightOutlined />
       </span>
     </Link>
   );
 }
 
 function Documentation({ match }) {
+  const locale = i18n.getLocale();
+  const labels = copy[locale] || copy.en;
   const docsRoot = getDocsRoot();
   const { slug } = match.params;
-  const currentTopic = allTopics.find((topic) => topic.slug === slug);
+  const localizedSections = sections.map((section, index) => ({
+    title: [labels.start, labels.onboarding, labels.technical][index],
+    topics: section.topics.map((topic) => ({
+      ...topic,
+      title: localizeText(topic.title, locale),
+      summary: localizeText(topic.summary, locale),
+      sourceTitle: topic.title,
+      sourceSummary: topic.summary,
+    })),
+  }));
+  const localizedTopics = localizedSections.reduce(
+    (items, section) => items.concat(section.topics),
+    []
+  );
+  const currentTopic = localizedTopics.find((topic) => topic.slug === slug);
   const [search, setSearch] = useState('');
   const [contents, setContents] = useState([]);
   const pageRef = useRef(null);
   const articleRef = useRef(null);
   const searchText = search.trim().toLowerCase();
-  const visibleSections = sections
+  const visibleSections = localizedSections
     .map((section) => ({
       ...section,
       topics: section.topics.filter(
         (topic) =>
           !searchText ||
-          `${topic.title} ${topic.summary}`.toLowerCase().includes(searchText)
+          `${topic.title} ${topic.summary} ${topic.sourceTitle} ${topic.sourceSummary}`
+            .toLowerCase()
+            .includes(searchText)
       ),
     }))
     .filter((section) => section.topics.length > 0);
-  const currentIndex = allTopics.findIndex((topic) => topic.slug === slug);
-  const previousTopic = allTopics[currentIndex - 1];
-  const nextTopic = allTopics[currentIndex + 1];
+  const currentIndex = localizedTopics.findIndex(
+    (topic) => topic.slug === slug
+  );
+  const previousTopic = localizedTopics[currentIndex - 1];
+  const nextTopic = localizedTopics[currentIndex + 1];
 
   useEffect(() => {
     pageRef.current?.scrollIntoView({ block: 'start' });
@@ -122,21 +222,21 @@ function Documentation({ match }) {
         };
       })
     );
-  }, [slug]);
+  }, [slug, locale]);
 
   return (
     <div className={styles['docs-page']} ref={pageRef}>
       <div className={styles['docs-header']}>
         <div>
           <div className={styles['docs-eyebrow']}>
-            Sovereign Next / Help center
+            Sovereign Next / {labels.helpCenter}
           </div>
           {slug ? (
-            <p className={styles['docs-title']}>Documentation</p>
+            <p className={styles['docs-title']}>{labels.documentation}</p>
           ) : (
-            <h1 className={styles['docs-title']}>Documentation</h1>
+            <h1 className={styles['docs-title']}>{labels.documentation}</h1>
           )}
-          <p>Everything you need to build and operate your private cloud.</p>
+          <p>{labels.tagline}</p>
         </div>
         <label className={styles['docs-search']} htmlFor="docs-search-input">
           <SearchOutlined aria-hidden="true" />
@@ -145,17 +245,14 @@ function Documentation({ match }) {
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Find a guide"
-            aria-label="Find a guide"
+            placeholder={labels.find}
+            aria-label={labels.find}
           />
         </label>
       </div>
 
       <div className={styles['docs-layout']}>
-        <aside
-          className={styles['docs-sidebar']}
-          aria-label="Documentation topics"
-        >
+        <aside className={styles['docs-sidebar']} aria-label={labels.topics}>
           <Link
             className={`${styles['topic-link']} ${
               !slug ? styles['topic-link-active'] : ''
@@ -163,7 +260,7 @@ function Documentation({ match }) {
             to={docsRoot}
             aria-current={!slug ? 'page' : undefined}
           >
-            Overview
+            {labels.overview}
           </Link>
           {visibleSections.map((section) => (
             <div key={section.title} className={styles['nav-section']}>
@@ -174,7 +271,7 @@ function Documentation({ match }) {
             </div>
           ))}
           {searchText && visibleSections.length === 0 && (
-            <p className={styles['empty-search']}>No matching guides.</p>
+            <p className={styles['empty-search']}>{labels.noMatches}</p>
           )}
         </aside>
 
@@ -183,35 +280,36 @@ function Documentation({ match }) {
             <div className={styles['docs-overview']}>
               <div className={styles['overview-heading']}>
                 <span className={styles['section-label']}>
-                  Explore the platform
+                  {labels.explore}
                 </span>
-                <h2>Get started with your cloud</h2>
-                <p>
-                  Follow the onboarding guides, then use the reference guides
-                  when choosing resources for an instance.
-                </p>
+                <h2>{labels.getStarted}</h2>
+                <p>{labels.intro}</p>
               </div>
               {visibleSections.map((section) => (
                 <section key={section.title} className={styles['card-section']}>
                   <h3>{section.title}</h3>
                   <div className={styles['topic-grid']}>
                     {section.topics.map((topic) => (
-                      <TopicCard key={topic.slug} topic={topic} />
+                      <TopicCard
+                        key={topic.slug}
+                        topic={topic}
+                        readLabel={labels.read}
+                      />
                     ))}
                   </div>
                 </section>
               ))}
               {searchText && visibleSections.length === 0 && (
-                <p className={styles['empty-search']}>No matching guides.</p>
+                <p className={styles['empty-search']}>{labels.noMatches}</p>
               )}
             </div>
           )}
 
           {slug && !currentTopic && (
             <div className={styles['missing-topic']}>
-              <h2>Guide not found</h2>
-              <p>The requested documentation page is not available.</p>
-              <Link to={docsRoot}>Browse documentation</Link>
+              <h2>{labels.missing}</h2>
+              <p>{labels.missingDetails}</p>
+              <Link to={docsRoot}>{labels.browse}</Link>
             </div>
           )}
 
@@ -219,7 +317,7 @@ function Documentation({ match }) {
             <div className={styles['article-layout']}>
               <article className={styles.article}>
                 <div className={styles['article-breadcrumb']}>
-                  <Link to={docsRoot}>Documentation</Link>
+                  <Link to={docsRoot}>{labels.documentation}</Link>
                   <span aria-hidden="true">/</span>
                   <span>{currentTopic.title}</span>
                 </div>
@@ -228,15 +326,15 @@ function Documentation({ match }) {
                   {currentTopic.summary}
                 </p>
                 <div className={styles['article-body']} ref={articleRef}>
-                  {currentTopic.content}
+                  <TopicContent topic={currentTopic} locale={locale} />
                 </div>
                 <nav
                   className={styles['article-pagination']}
-                  aria-label="More guides"
+                  aria-label={labels.more}
                 >
                   {previousTopic ? (
                     <Link to={topicPath(previousTopic.slug)}>
-                      <ArrowLeftOutlined /> Previous
+                      <ArrowLeftOutlined /> {labels.previous}
                       <strong>{previousTopic.title}</strong>
                     </Link>
                   ) : (
@@ -244,7 +342,7 @@ function Documentation({ match }) {
                   )}
                   {nextTopic && (
                     <Link to={topicPath(nextTopic.slug)}>
-                      Next <ArrowRightOutlined />
+                      {labels.next} <ArrowRightOutlined />
                       <strong>{nextTopic.title}</strong>
                     </Link>
                   )}
@@ -253,9 +351,9 @@ function Documentation({ match }) {
               {contents.length > 0 && (
                 <aside
                   className={styles['article-contents']}
-                  aria-label="On this page"
+                  aria-label={labels.onPage}
                 >
-                  <h2>On this page</h2>
+                  <h2>{labels.onPage}</h2>
                   {contents.map((item) => (
                     <a
                       key={item.id}

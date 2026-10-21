@@ -40,7 +40,7 @@ export class BasicVolume extends AdvancedVolume {
           if (value && value.length > 0) {
             return value.map((it) => (
               <div key={it.server_id}>
-                {it.device} on{' '}
+                {it.device} {t('on')}{' '}
                 {this.getLinkRender(
                   'instanceDetail',
                   it.server_name || it.server_id,
@@ -57,7 +57,9 @@ export class BasicVolume extends AdvancedVolume {
             return value
               .map((it) => {
                 const { device, server_name, server_id } = it;
-                return `${device} on ${server_name || '-'}(${server_id})`;
+                return `${device} ${t('on')} ${
+                  server_name || '-'
+                }(${server_id})`;
               })
               .join(',');
           }

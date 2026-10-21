@@ -1,9 +1,11 @@
 import { Select } from 'antd';
 import { get } from 'lodash';
+import i18n from 'core/i18n';
 
 import React, { useState } from 'react';
 
 const { Option } = Select;
+const { t } = i18n;
 const useNodeSelect = (defaultNode) => {
   const [node, setNode] = useState(defaultNode);
   const [nodes, setNodes] = useState([]);
@@ -21,7 +23,7 @@ const useNodeSelect = (defaultNode) => {
     return (
       <div style={{ marginBottom: 16 }}>
         <span style={{ color: 'black', fontSize: 14, fontWeight: 400 }}>
-          Node:{' '}
+          {t('Node')}:{' '}
         </span>
         <Select
           value={node.metric[key]}

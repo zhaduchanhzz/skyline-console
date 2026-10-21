@@ -15,8 +15,10 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Select, Input, Checkbox, Button } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import client from 'client';
+import i18n from 'core/i18n';
 
 const { Option } = Select;
+const { t } = i18n;
 
 const L7PolicyItem = ({ field }) => {
   const [action, setAction] = useState(null);
@@ -62,12 +64,12 @@ const L7PolicyItem = ({ field }) => {
       <Row gutter={16}>
         <Col span={24}>
           <Form.Item
-            label="Action"
+            label={t('Action')}
             name={[field.name, 'action']}
-            rules={[{ required: true, message: 'Action is required' }]}
+            rules={[{ required: true, message: t('Action is required') }]}
           >
             <Select
-              placeholder="Select Action"
+              placeholder={t('Select Action')}
               onChange={(val) => setAction(val)}
             >
               <Option value="REDIRECT_TO_URL">REDIRECT_TO_URL</Option>
@@ -82,11 +84,11 @@ const L7PolicyItem = ({ field }) => {
         <Row>
           <Col span={24}>
             <Form.Item
-              label="Redirect URL"
+              label={t('Redirect URL')}
               name={[field.name, 'redirect_url']}
               rules={[
-                { required: true, message: 'Redirect URL is required' },
-                { type: 'url', message: 'Enter a valid URL' },
+                { required: true, message: t('Redirect URL is required') },
+                { type: 'url', message: t('Enter a valid URL') },
               ]}
             >
               <Input placeholder="https://example.com" />
@@ -99,11 +101,11 @@ const L7PolicyItem = ({ field }) => {
         <Row>
           <Col span={24}>
             <Form.Item
-              label="Redirect Pool ID"
+              label={t('Redirect Pool ID')}
               name={[field.name, 'redirect_pool_id']}
-              rules={[{ required: true, message: 'Pool ID is required' }]}
+              rules={[{ required: true, message: t('Pool ID is required') }]}
             >
-              <Select placeholder="Select Pool">
+              <Select placeholder={t('Select Pool')}>
                 {pools.map((pool) => (
                   <Option key={pool.id} value={pool.id}>
                     {pool.id}
@@ -131,9 +133,11 @@ const L7PolicyItem = ({ field }) => {
                 <Row gutter={24}>
                   <Col span={16}>
                     <Form.Item
-                      label="Type"
+                      label={t('Type')}
                       name={[ruleField.name, 'type']}
-                      rules={[{ required: true, message: 'Type is required' }]}
+                      rules={[
+                        { required: true, message: t('Type is required') },
+                      ]}
                     >
                       <Select>
                         <Option value="HOST_NAME">HOST_NAME</Option>
@@ -143,10 +147,13 @@ const L7PolicyItem = ({ field }) => {
 
                   <Col span={20}>
                     <Form.Item
-                      label="Compare Type"
+                      label={t('Compare Type')}
                       name={[ruleField.name, 'compareType']}
                       rules={[
-                        { required: true, message: 'Compare type is required' },
+                        {
+                          required: true,
+                          message: t('Compare type is required'),
+                        },
                       ]}
                     >
                       <Select>
@@ -161,9 +168,11 @@ const L7PolicyItem = ({ field }) => {
 
                   <Col span={16}>
                     <Form.Item
-                      label="Value"
+                      label={t('Value')}
                       name={[ruleField.name, 'value']}
-                      rules={[{ required: true, message: 'Value is required' }]}
+                      rules={[
+                        { required: true, message: t('Value is required') },
+                      ]}
                     >
                       <Input />
                     </Form.Item>
@@ -171,7 +180,7 @@ const L7PolicyItem = ({ field }) => {
 
                   <Col span={16}>
                     <Form.Item
-                      label="Key (Optional)"
+                      label={t('Key (Optional)')}
                       name={[ruleField.name, 'key']}
                     >
                       <Input />
@@ -180,7 +189,7 @@ const L7PolicyItem = ({ field }) => {
 
                   <Col span={2}>
                     <Form.Item
-                      label="Invert"
+                      label={t('Invert')}
                       name={[ruleField.name, 'invert']}
                       valuePropName="checked"
                     >
@@ -204,7 +213,7 @@ const L7PolicyItem = ({ field }) => {
                 onClick={() => add()}
                 icon={<PlusOutlined />}
               >
-                Add Rule
+                {t('Add Rule')}
               </Button>
             </Form.Item>
           </>

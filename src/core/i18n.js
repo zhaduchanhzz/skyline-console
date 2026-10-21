@@ -14,6 +14,7 @@
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import 'moment/locale/vi';
 import _, { isArray } from 'lodash';
 import cookie from 'utils/cookie';
 import SLI18n from 'utils/translate';
@@ -24,6 +25,13 @@ import locales from '../locales';
 // shortName: the i18n name in the api
 // icon: the icon of switch language in ui
 const SUPPORT_LOCALES_ALL = [
+  {
+    name: 'Tiếng Việt',
+    value: 'vi',
+    shortName: 'vi',
+    icon: 'vi',
+    momentName: 'vi',
+  },
   {
     name: 'English',
     value: 'en',
@@ -36,7 +44,7 @@ const SUPPORT_LOCALES_ALL = [
     value: 'zh-hans',
     shortName: 'zh',
     icon: 'zh',
-    momentName: 'zhCN',
+    momentName: 'zh-cn',
   },
   {
     name: '한글',
@@ -63,9 +71,9 @@ const SUPPORT_LOCALES_ALL = [
 
 const getDefaultLanguageInConfig = () => {
   const { defaultLanguage } = GLOBAL_VARIABLES;
-  const defaultLang = defaultLanguage || 'en';
+  const defaultLang = defaultLanguage || 'vi';
   const inSupport = SUPPORT_LOCALES_ALL.find((it) => it.value === defaultLang);
-  return inSupport ? defaultLang : 'en';
+  return inSupport ? defaultLang : 'vi';
 };
 
 const getSupportLanguagesInConfig = () => {
@@ -105,23 +113,23 @@ const setLocaleToStorage = (value) => {
 };
 
 const getLocale = () => {
-  let currentLocale = intl.determineLocale({
-    urlLocaleKey: 'lang',
-    cookieLocaleKey: 'lang',
-    localStorageLocaleKey: 'lang',
-  });
+  // An explicit choice wins. On a first visit use the configured default,
+  // regardless of the browser's language.
+  let currentLocale =
+    intl.getLocaleFromLocalStorage({ localStorageLocaleKey: 'lang' }) ||
+    intl.getLocaleFromURL({ urlLocaleKey: 'lang' }) ||
+    intl.getLocaleFromCookie({ cookieLocaleKey: 'lang' });
 
-  const { defaultLanguage } = GLOBAL_VARIABLES;
-
-  // If not found, the default language is set in config.yaml
   if (!_.find(SUPPORT_LOCALES, { value: currentLocale })) {
-    currentLocale = defaultLanguage;
+    currentLocale = getDefaultLanguageInConfig();
   }
 
   if (!currentLocals) {
     currentLocals = locales[currentLocale];
   }
-  moment.locale(currentLocale);
+  moment.locale(getMomentName(currentLocale));
+  document.documentElement.lang =
+    currentLocale === 'zh-hans' ? 'zh-CN' : currentLocale;
   return currentLocale;
 };
 
