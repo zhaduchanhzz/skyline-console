@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { lazy } from 'react';
 import BaseLayout from 'layouts/Basic';
 import E404 from '../containers/404';
 import Overview from '../containers/Overview';
 import AdminOverview from '../containers/AdminOverview';
 import BasicHome from '../containers/BasicHome';
+
+const Docs = lazy(() =>
+  import(/* webpackChunkName: "documentation" */ '../containers/Documentation')
+);
 
 const PATH = '/base';
 export default [
@@ -27,6 +32,8 @@ export default [
       { path: `${PATH}/overview`, component: Overview, exact: true },
       { path: `${PATH}/overview-admin`, component: AdminOverview, exact: true },
       { path: `${PATH}/basic-home`, component: BasicHome, exact: true },
+      { path: `${PATH}/docs-admin/:slug?`, component: Docs, exact: true },
+      { path: `${PATH}/docs/:slug?`, component: Docs, exact: true },
       { path: '*', component: E404 },
     ],
   },

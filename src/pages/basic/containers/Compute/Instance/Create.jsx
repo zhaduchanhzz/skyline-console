@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Spin } from 'antd';
 import { toJS } from 'mobx';
 import { inject, observer } from 'mobx-react';
@@ -470,13 +471,7 @@ export class BasicInstanceCreate extends FormAction {
   get instanceResourcesTip() {
     return (
       <span>
-        <a
-          href="https://docs.rackspacecloud.com/openstack-flavors/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {t('Help me choose a flavor')}
-        </a>
+        <Link to="/base/docs/flavors">{t('Help me choose a flavor')}</Link>
       </span>
     );
   }
@@ -486,13 +481,7 @@ export class BasicInstanceCreate extends FormAction {
   get operatingSystemTip() {
     return (
       <span>
-        <a
-          href="https://docs.rackspacecloud.com/openstack-glance-images/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {t('More about images')}
-        </a>
+        <Link to="/base/docs/images">{t('More about images')}</Link>
       </span>
     );
   }

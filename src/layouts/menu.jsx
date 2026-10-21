@@ -40,11 +40,6 @@ const renderMenu = (t) => {
     (typeof GLOBAL_VARIABLES !== 'undefined' &&
       GLOBAL_VARIABLES.gettingStartedUrl) ||
     'https://www.youtube.com/watch?v=euINDzNBMZc&list=PLXK8KWNgW1MvNAsjegC8lm4HmR6dpHmAO';
-  const documentationUrl =
-    (typeof GLOBAL_VARIABLES !== 'undefined' &&
-      GLOBAL_VARIABLES.documentationUrl) ||
-    'https://docs.rackspacecloud.com/cloud-onboarding-welcome';
-
   const menu = [
     {
       path: '/base/overview',
@@ -1029,14 +1024,14 @@ const renderMenu = (t) => {
       key: 'help-divider',
     },
     {
-      externalUrl: documentationUrl,
+      path: /^\/base\/docs(?:\/[^/]+)?$/,
+      routePath: '/base/docs',
       name: t('Documentation'),
       key: 'documentation',
       icon: <BookOutlined />,
       level: 0,
       hasBreadcrumb: false,
       hasChildren: false,
-      ariaLabel: t('Documentation - Opens documentation in new tab'),
     },
     {
       externalUrl: gettingStartedUrl,
