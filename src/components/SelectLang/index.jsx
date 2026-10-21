@@ -14,22 +14,27 @@
 
 import { Menu, Dropdown } from 'antd';
 import i18n from 'core/i18n';
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
-import { GlobalOutlined } from '@ant-design/icons';
+import { DownOutlined, GlobalOutlined } from '@ant-design/icons';
 import styles from './index.less';
 
 const { getLocale, setLocale, SUPPORT_LOCALES } = i18n;
 
 const SelectLang = (props) => {
+  const [visible, setVisible] = useState(false);
   if (SUPPORT_LOCALES.length <= 1) {
     return null;
   }
 
-  const { className } = props;
+  const { className, navbar = false } = props;
   const selectedLang = getLocale();
+  const selectedLocale = SUPPORT_LOCALES.find(
+    (it) => it.value === selectedLang
+  );
 
   const changeLang = ({ key }) => {
+    setVisible(false);
     setLocale(key, false);
   };
 
@@ -52,12 +57,33 @@ const SelectLang = (props) => {
       ))}
     </Menu>
   );
-  // return langMenu;
   return (
-    <Dropdown overlay={langMenu} placement="bottomRight">
-      <span className={classNames(styles['drop-down'], className)}>
-        <GlobalOutlined />
-      </span>
+    <Dropdown
+      overlay={langMenu}
+      placement="bottomRight"
+      trigger={['click']}
+      visible={visible}
+      onVisibleChange={setVisible}
+    >
+      <button
+        type="button"
+        className={classNames(styles['drop-down'], className)}
+        aria-label={`${t('Switch Language')}: ${selectedLocale.name}`}
+        aria-haspopup="menu"
+        aria-expanded={visible}
+      >
+        <GlobalOutlined className={navbar ? styles['navbar-globe'] : ''} />
+        {navbar && (
+          <>
+            <span className={styles['language-code']}>
+              {selectedLang === 'zh-hans'
+                ? '中文'
+                : selectedLocale.icon.toUpperCase()}
+            </span>
+            <DownOutlined className={styles['navbar-caret']} />
+          </>
+        )}
+      </button>
     </Dropdown>
   );
 };

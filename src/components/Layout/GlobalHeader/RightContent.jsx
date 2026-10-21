@@ -15,6 +15,7 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
 import { Button, Col, Row } from 'antd';
+import SelectLang from 'components/SelectLang';
 import Avatar from './AvatarDropdown';
 import ModeToggle from './ModeToggle';
 import styles from './index.less';
@@ -84,6 +85,9 @@ export class GlobalHeaderRight extends Component {
             {this.renderAdministrator()}
           </Col>
           {this.renderExtra()}
+          <Col>
+            <SelectLang className={styles['nav-language']} navbar />
+          </Col>
           <Col>
             <ModeToggle />
           </Col>

@@ -18,6 +18,8 @@
   font-size: 16px;
   line-height: 20px;
   vertical-align: top;
+  background: transparent;
+  border: 0;
   border-radius: 8px;
   cursor: pointer;
   transition: color 0.2s ease, background-color 0.2s ease;
@@ -25,6 +27,25 @@
   &:hover {
     color: #1769ff;
     background-color: rgba(23, 105, 255, 10%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #1769ff;
+    outline-offset: 2px;
+  }
+
+  .language-code {
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .navbar-caret {
+    font-size: 9px;
+  }
+
+  .navbar-globe {
+    font-size: 15px;
   }
 
   > i {
