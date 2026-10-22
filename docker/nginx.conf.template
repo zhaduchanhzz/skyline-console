@@ -22,6 +22,10 @@ server {
         add_header Cache-Control "no-cache";
     }
 
+    location = /favicon.ico {
+        add_header Cache-Control "no-cache";
+    }
+
     location / {
         try_files $uri $uri/ /index.html;
     }

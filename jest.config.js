@@ -34,8 +34,8 @@ module.exports = {
   setupFiles: ['<rootDir>/test/unit/setup-tests.js'],
   globals: {
     GLOBAL_VARIABLES: {
-      defaultLanguage: 'en',
-      supportLanguages: ['en', 'zh-hans'],
+      defaultLanguage: 'vi',
+      supportLanguages: ['vi', 'en'],
     },
   },
 };

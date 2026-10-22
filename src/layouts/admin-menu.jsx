@@ -1216,12 +1216,14 @@ const renderMenu = (t) => {
     {
       path: /^\/base\/docs-admin(?:\/[^/]+)?$/,
       routePath: '/base/docs-admin',
+      externalUrl: '/base/docs-admin',
       name: t('Documentation'),
       key: 'documentationAdmin',
       icon: <BookOutlined />,
       level: 0,
       hasBreadcrumb: false,
       hasChildren: false,
+      ariaLabel: t('Documentation - Opens documentation in new tab'),
     },
     {
       externalUrl: gettingStartedUrl,

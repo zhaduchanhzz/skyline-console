@@ -5,12 +5,12 @@
 - Trang đăng nhập hiển thị logo MBFS trong [Auth layout](src/layouts/Auth/index.jsx); thanh điều hướng sau đăng nhập hiển thị cùng logo trong [GlobalHeader](src/components/Layout/GlobalHeader/index.jsx).
 - File nguồn là [src/asset/image/mbfs-logo.svg](src/asset/image/mbfs-logo.svg). Bản build đã chứa [skyline_console/static/asset/image/mbfs-logo.svg](skyline_console/static/asset/image/mbfs-logo.svg); [webpack.common.js](config/webpack.common.js) xuất SVG này với tên cố định.
 - [src/asset/image/favicon.ico](src/asset/image/favicon.ico) là biểu tượng MBFS nền trong suốt. Bản build dùng cùng file tại [skyline_console/static/favicon.ico](skyline_console/static/favicon.ico); cấu hình Webpack lấy favicon từ file nguồn cho cả dev và production.
-- Các file `cloud-logo.svg`, `cloud-logo-white.svg`, `logo.png` và `loginRightLogo.png` vẫn còn trong thư mục nguồn nhưng không còn được hai thành phần giao diện trên sử dụng. Bản build hiện tại không chứa các file logo cũ đó trong `skyline_console/static/asset/image/`.
+- Các logo cũ `cloud-logo.svg`, `cloud-logo-white.svg`, `logo.png`, `loginRightLogo.png`, `genestackLogo.png` và `openstack-new-logo.png/.webp` đã được xóa khỏi nguồn. Bản build chỉ xuất logo MBFS SVG và favicon MBFS cho phần nhận diện.
 - Tên sản phẩm trong tiêu đề trang và lời chào vẫn là Sovereign Next; thay đổi này áp dụng cho hình logo MBFS.
 
 ## Kiểm kê lịch sử trước khi đổi logo MBFS
 
-Phần dưới ghi lại kết quả khảo sát cũ. Số lượng ảnh, đường dẫn trong bản build và mô tả vị trí hiển thị ở phần này **không phản ánh giao diện hiện tại**; một số liên kết tới file build cũ có thể không còn tồn tại.
+Phần dưới ghi lại kết quả khảo sát cũ. Số lượng ảnh, đường dẫn trong bản build và mô tả vị trí hiển thị ở phần này **không phản ánh giao diện hiện tại**; một số liên kết tới file nguồn và build cũ có thể không còn tồn tại.
 
 Đã kiểm tra trực quan 289 ảnh trong repository (kể cả SVG được vẽ bằng path và các bản build). Có **228 ảnh chứa từ đọc được**: 218 ảnh tài liệu, 6 ảnh nguồn ứng dụng và 4 bản sao trong bản build. Biểu tượng đơn lẻ không được tính là chữ.
 

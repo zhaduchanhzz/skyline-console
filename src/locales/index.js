@@ -12,18 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import zhHansData from './zh-hans.json';
 import enData from './en.json';
 import viData from './vi.json';
-import krData from './ko-kr.json';
-import trData from './tr-tr.json';
-import ruData from './ru.json';
 
 export default {
   vi: viData,
-  'zh-hans': zhHansData,
   en: enData,
-  'ko-kr': krData,
-  'tr-tr': trData,
-  ru: ruData,
 };

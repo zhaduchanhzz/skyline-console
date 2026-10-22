@@ -9,4 +9,3 @@ globalVariables:
   supportLanguages: # use value in i18n.js
     - vi
     - en
-    - zh-hans

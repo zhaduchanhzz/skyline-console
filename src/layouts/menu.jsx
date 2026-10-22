@@ -1026,12 +1026,14 @@ const renderMenu = (t) => {
     {
       path: /^\/base\/docs(?:\/[^/]+)?$/,
       routePath: '/base/docs',
+      externalUrl: '/base/docs',
       name: t('Documentation'),
       key: 'documentation',
       icon: <BookOutlined />,
       level: 0,
       hasBreadcrumb: false,
       hasChildren: false,
+      ariaLabel: t('Documentation - Opens documentation in new tab'),
     },
     {
       externalUrl: gettingStartedUrl,

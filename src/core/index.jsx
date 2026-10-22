@@ -21,12 +21,8 @@ import globalRootStore from 'stores/root';
 import PageLoading from 'components/PageLoading';
 import metricDict from 'resources/prometheus/metricDict';
 import variables from 'styles/variables.less';
-import zhCN from 'antd/es/locale/zh_CN';
 import viVN from 'antd/es/locale/vi_VN';
 import enUS from 'antd/es/locale/en_US';
-import koKR from 'antd/es/locale/ko_KR';
-import trTR from 'antd/es/locale/tr_TR';
-import ruRU from 'antd/es/locale/ru_RU';
 import i18n from './i18n';
 import App from './App';
 
@@ -41,10 +37,6 @@ const history = syncHistoryWithStore(browserHistory, store.routing);
 const antdLanguageMap = {
   vi: viVN,
   en: enUS,
-  'zh-hans': zhCN,
-  'ko-kr': koKR,
-  'tr-tr': trTR,
-  ru: ruRU,
 };
 
 const getAntdLocale = (locale) => {

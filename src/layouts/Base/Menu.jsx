@@ -31,13 +31,15 @@ const { SubMenu, Divider } = Menu;
 
 const { getLocaleShortName } = i18n;
 const AUTO_COLLAPSE_BREAKPOINT = 1024;
+const isDocumentationPath = (pathname = '') =>
+  /^\/base\/docs(?:-admin)?(?:\/|$)/.test(pathname);
 
 export class LayoutMenu extends Component {
   constructor(props) {
     super(props);
     const isNarrowViewport = this.checkIsNarrowViewport();
     this.state = {
-      collapsed: isNarrowViewport,
+      collapsed: isNarrowViewport || isDocumentationPath(props.pathname),
       hover: false,
       openKeys: [],
       isNarrowViewport,
@@ -56,6 +58,19 @@ export class LayoutMenu extends Component {
     const { pathname } = this.props;
     const { pathname: prevPathname } = prevProps;
     if (prevPathname && pathname !== prevPathname) {
+      const wasDocumentation = isDocumentationPath(prevPathname);
+      const isDocumentation = isDocumentationPath(pathname);
+      if (wasDocumentation !== isDocumentation) {
+        this.setState(
+          (state) => ({
+            collapsed: isDocumentation || state.isNarrowViewport,
+            hover: false,
+          }),
+          () => {
+            this.syncCollapseState(this.state.collapsed);
+          }
+        );
+      }
       this.updateOpenKeysByRoute();
     }
   }
@@ -114,15 +129,15 @@ export class LayoutMenu extends Component {
     if (isNarrowViewport === prevNarrowViewport) {
       return;
     }
-    const nextCollapsed = isNarrowViewport;
+    const isDocumentation = isDocumentationPath(this.props.pathname);
     this.setState(
-      {
-        collapsed: nextCollapsed,
+      (state) => ({
+        collapsed: isNarrowViewport || (isDocumentation && state.collapsed),
         hover: false,
         isNarrowViewport,
-      },
+      }),
       () => {
-        this.syncCollapseState(nextCollapsed);
+        this.syncCollapseState(this.state.collapsed);
       }
     );
   };

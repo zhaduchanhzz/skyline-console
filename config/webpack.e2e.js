@@ -144,6 +144,7 @@ module.exports = (env) => {
       new HtmlWebPackPlugin({
         template: root('src/asset/template/index.html'),
         favicon: root('src/asset/image/favicon.ico'),
+        hash: true,
       }),
       new CleanWebpackPlugin(['dist'], {
         root: resolve(__dirname, `../`),

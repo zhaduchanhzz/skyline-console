@@ -50,20 +50,6 @@ module.exports = {
             },
           },
         ],
-        exclude: [root('src/asset/image/genestackLogo.png')],
-      },
-      {
-        test: /\.(png|gif|jpg|webp)$/,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: false,
-              name: normalize('asset/image/[name].[ext]'),
-            },
-          },
-        ],
-        include: [root('src/asset/image/genestackLogo.png')],
       },
       {
         test: /\.svg$/,

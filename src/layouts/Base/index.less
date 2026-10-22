@@ -137,6 +137,16 @@
       background-color: @sider-menu-item-selected-background;
     }
   }
+
+  :global(.ant-menu-submenu-title) {
+    .menu-item-title {
+      font-size: 13px;
+    }
+
+    :global(.anticon) {
+      margin-right: 6px;
+    }
+  }
 }
 
 .menu-item {
@@ -377,7 +387,7 @@
     padding-left: 0;
 
     .menu-item-collapsed {
-      padding-left: 12px !important;
+      padding-left: 9px !important;
       text-overflow: inherit;
     }
   }

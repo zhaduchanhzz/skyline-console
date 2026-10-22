@@ -336,6 +336,7 @@ const renderBasicMenu = (t) => {
     {
       path: /^\/base\/docs(?:\/[^/]+)?$/,
       routePath: '/base/docs',
+      externalUrl: '/base/docs',
       name: t('Documentation'),
       key: 'documentation',
       icon: <BookOutlined />,
@@ -343,6 +344,7 @@ const renderBasicMenu = (t) => {
       hasBreadcrumb: false,
       hasChildren: false,
       basicHelp: true,
+      ariaLabel: t('Documentation - Opens documentation in new tab'),
     },
     {
       externalUrl: gettingStartedUrl,

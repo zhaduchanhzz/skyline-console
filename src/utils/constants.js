@@ -38,7 +38,6 @@ export const MODULE_KIND_MAP = {
 };
 
 export const LANG_MAP = {
-  'zh-hans': 'zh-hans',
   en: 'en',
   vi: 'vi',
 };
