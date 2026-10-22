@@ -10,7 +10,7 @@ const MODULES = [
     iconCenter: [648, 421],
     iconPath:
       'M 647 389 C 666 389 680 405 680 422 C 680 440 666 454 648 454 C 630 454 616 441 616 422 C 616 405 629 389 647 389 Z',
-    labelPosition: [840, 338],
+    labelPosition: [810, 455],
   },
   {
     id: 'k8s',
