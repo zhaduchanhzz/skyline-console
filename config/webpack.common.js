@@ -50,11 +50,7 @@ module.exports = {
             },
           },
         ],
-        exclude: [
-          root('src/asset/image/logo.png'),
-          root('src/asset/image/loginRightLogo.png'),
-          root('src/asset/image/genestackLogo.png'),
-        ],
+        exclude: [root('src/asset/image/genestackLogo.png')],
       },
       {
         test: /\.(png|gif|jpg|webp)$/,
@@ -67,11 +63,7 @@ module.exports = {
             },
           },
         ],
-        include: [
-          root('src/asset/image/logo.png'),
-          root('src/asset/image/loginRightLogo.png'),
-          root('src/asset/image/genestackLogo.png'),
-        ],
+        include: [root('src/asset/image/genestackLogo.png')],
       },
       {
         test: /\.svg$/,
@@ -84,10 +76,7 @@ module.exports = {
             },
           },
         ],
-        include: [
-          root('src/asset/image/cloud-logo.svg'),
-          root('src/asset/image/cloud-logo-white.svg'),
-        ],
+        include: [root('src/asset/image/mbfs-logo.svg')],
       },
       {
         test: /\.(woff|woff2|ttf|eot|svg)$/,
@@ -100,10 +89,7 @@ module.exports = {
             },
           },
         ],
-        exclude: [
-          root('src/asset/image/cloud-logo.svg'),
-          root('src/asset/image/cloud-logo-white.svg'),
-        ],
+        exclude: [root('src/asset/image/mbfs-logo.svg')],
       },
     ],
   },

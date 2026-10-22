@@ -14,8 +14,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import cloudLogo from 'asset/image/cloud-logo.svg';
-import cloudLogoWhite from 'asset/image/cloud-logo-white.svg';
+import mbfsLogo from 'asset/image/mbfs-logo.svg';
 import { getPath } from 'utils/route-map';
 import classnames from 'classnames';
 import GlobalNav from '../GlobalNav';
@@ -36,14 +35,10 @@ export default function HeaderContent(props) {
 
   const renderLogo = () => {
     const homeUrl = getRoutePath('overview');
-    const logoSrc =
-      GLOBAL_VARIABLES.skylineThemeName === 'default'
-        ? cloudLogo
-        : cloudLogoWhite;
     return (
       <div className={classnames(styles.logo)}>
         <Link to={homeUrl}>
-          <img src={logoSrc} alt="logo" className={styles['logo-image']} />
+          <img src={mbfsLogo} alt="MBFS" className={styles['logo-image']} />
         </Link>
       </div>
     );

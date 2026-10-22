@@ -17,6 +17,7 @@ import { inject, observer } from 'mobx-react';
 import { Tag } from 'antd';
 import { BellOutlined, ToolOutlined } from '@ant-design/icons';
 import renderRoutes from 'utils/RouterConfig';
+import mbfsLogo from 'asset/image/mbfs-logo.svg';
 import globalMessageBannerStore from 'stores/skyline/message-banner';
 import {
   getMessageTypeLabel,
@@ -134,12 +135,8 @@ export class AuthLayout extends Component {
             role="banner"
             aria-labelledby="brand-title"
           >
-            <h2
-              id="brand-title"
-              className={styles.brandTitle}
-              aria-label="Sovereign Next"
-            >
-              Sovereign Next
+            <h2 id="brand-title" className={styles.brandTitle}>
+              <img src={mbfsLogo} alt="MBFS" className={styles.brandLogo} />
             </h2>
           </div>
         </section>
