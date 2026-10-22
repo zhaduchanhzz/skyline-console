@@ -1,4 +1,15 @@
-# Kiểm kê ảnh có chữ và dấu vết Rackspace
+# Trạng thái logo hiện tại và kiểm kê lịch sử
+
+## Logo MBFS hiện tại
+
+- Trang đăng nhập hiển thị logo MBFS trong [Auth layout](src/layouts/Auth/index.jsx); thanh điều hướng sau đăng nhập hiển thị cùng logo trong [GlobalHeader](src/components/Layout/GlobalHeader/index.jsx).
+- File nguồn là [src/asset/image/mbfs-logo.svg](src/asset/image/mbfs-logo.svg). Bản build đã chứa [skyline_console/static/asset/image/mbfs-logo.svg](skyline_console/static/asset/image/mbfs-logo.svg); [webpack.common.js](config/webpack.common.js) xuất SVG này với tên cố định.
+- Các file `cloud-logo.svg`, `cloud-logo-white.svg`, `logo.png` và `loginRightLogo.png` vẫn còn trong thư mục nguồn nhưng không còn được hai thành phần giao diện trên sử dụng. Bản build hiện tại không chứa các file logo cũ đó trong `skyline_console/static/asset/image/`.
+- Tên sản phẩm trong tiêu đề trang và lời chào vẫn là Sovereign Next; thay đổi này áp dụng cho hình logo MBFS.
+
+## Kiểm kê lịch sử trước khi đổi logo MBFS
+
+Phần dưới ghi lại kết quả khảo sát cũ. Số lượng ảnh, đường dẫn trong bản build và mô tả vị trí hiển thị ở phần này **không phản ánh giao diện hiện tại**; một số liên kết tới file build cũ có thể không còn tồn tại.
 
 Đã kiểm tra trực quan 289 ảnh trong repository (kể cả SVG được vẽ bằng path và các bản build). Có **228 ảnh chứa từ đọc được**: 218 ảnh tài liệu, 6 ảnh nguồn ứng dụng và 4 bản sao trong bản build. Biểu tượng đơn lẻ không được tính là chữ.
 
@@ -9,7 +20,7 @@
 | `skyline_console/static/` |          4 |       13 |
 | `test/`                   |          0 |        1 |
 
-## Ảnh ứng dụng có chữ
+### Ảnh ứng dụng có chữ
 
 | File                                                                                                                 | Chữ nhìn thấy          | Vai trò                                        |
 | -------------------------------------------------------------------------------------------------------------------- | ---------------------- | ---------------------------------------------- |
@@ -24,14 +35,14 @@
 | [skyline_console/static/asset/image/logo.png](skyline_console/static/asset/image/logo.png)                           | `rackspace technology` | Bản build, trùng byte với nguồn                |
 | [skyline_console/static/asset/image/oracle.1791533518.svg](skyline_console/static/asset/image/oracle.1791533518.svg) | `ORACLE Linux`         | Bản build, trùng byte với nguồn                |
 
-Vị trí hiển thị logo: [GlobalHeader](src/components/Layout/GlobalHeader/index.jsx) dòng 17–18, 37–46 chọn hai `cloud-logo` theo theme; [Login](src/pages/auth/containers/Login/index.jsx) dòng 26, 635–639 dùng `logo.png`. [webpack.common.js](config/webpack.common.js) dòng 54–55, 71–72 có tham chiếu `loginRightLogo.png`.
+Tại thời điểm kiểm kê cũ, vị trí hiển thị logo là: [GlobalHeader](src/components/Layout/GlobalHeader/index.jsx) dòng 17–18, 37–46 chọn hai `cloud-logo` theo theme; [Login](src/pages/auth/containers/Login/index.jsx) dòng 26, 635–639 dùng `logo.png`. [webpack.common.js](config/webpack.common.js) dòng 54–55, 71–72 có tham chiếu `loginRightLogo.png`.
 
-## Ảnh chỉ có biểu tượng Rackspace, không có chữ
+### Ảnh chỉ có biểu tượng Rackspace, không có chữ
 
 - [src/asset/image/favicon.ico](src/asset/image/favicon.ico) và [skyline_console/static/favicon.ico](skyline_console/static/favicon.ico).
 - [src/asset/image/openstack-new-logo.png](src/asset/image/openstack-new-logo.png), [src/asset/image/openstack-new-logo.webp](src/asset/image/openstack-new-logo.webp), [bản PNG đã build](skyline_console/static/asset/image/openstack-new-logo.1791533518.png), [bản WebP đã build](skyline_console/static/asset/image/openstack-new-logo.1791533518.webp). Biểu tượng này được dùng ở [Auth](src/layouts/Auth/index.jsx) dòng 29–30, 192–198; dòng chữ “Rackspace OpenStack” bên cạnh nằm trong JSX dòng 203–205.
 
-## Ảnh tài liệu có chữ
+### Ảnh tài liệu có chữ
 
 Có 218 ảnh PNG trong `docs/` chứa chữ giao diện, mã hoặc kết quả kiểm thử. Không thấy chữ Rackspace trong các ảnh này; ảnh giao diện cũ dùng logo Animbus. Sáu PNG chỉ có biểu tượng, không có chữ, là `download.png`, `fresh.png`, `stop-auto-refresh.png` ở cả hai thư mục `docs/en/develop/images/list/` và `docs/zh/develop/images/list/`.
 
@@ -259,7 +270,7 @@ Có 218 ảnh PNG trong `docs/` chứa chữ giao diện, mã hoặc kết quả
 
 </details>
 
-## Chữ Rackspace trong mã nguồn (không nằm trong ảnh)
+### Chữ Rackspace trong mã nguồn (không nằm trong ảnh)
 
 - Giao diện/title: [Auth](src/layouts/Auth/index.jsx) dòng 195, 203–205; [Login](src/pages/auth/containers/Login/index.jsx) dòng 111–120, 663; [Blank](src/layouts/Blank/index.jsx) dòng 40, 44; [HTML template](src/asset/template/index.html) dòng 9; [HTML bản build](skyline_console/static/index.html) dòng 1; [tooltip DNS](src/pages/network/containers/Network/actions/networkUtil.js) dòng 81.
 - URL Rackspace: [menu](src/layouts/menu.jsx) dòng 46; [basic-menu](src/layouts/basic-menu.jsx) dòng 26; [admin-menu](src/layouts/admin-menu.jsx) dòng 47; [đăng nhập](src/pages/auth/containers/Login/index.jsx) dòng 49; [tạo instance](src/pages/basic/containers/Compute/Instance/Create.jsx) dòng 474, 490 và [BaseStep](src/pages/compute/containers/Instance/actions/StepCreate/BaseStep/index.jsx) dòng 589, 603.
