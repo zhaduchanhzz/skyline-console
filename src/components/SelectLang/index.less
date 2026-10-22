@@ -1,10 +1,19 @@
 .menu {
-  :global(.anticon) {
-    margin-right: 8px;
+  :global(.ant-dropdown-menu-item) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 148px;
+    padding: 8px 14px;
   }
 
-  :global(.ant-dropdown-menu-item) {
-    min-width: 160px;
+  .menu-label {
+    margin-right: 18px;
+  }
+
+  .menu-check {
+    color: #1769ff;
+    font-size: 12px;
   }
 }
 
@@ -16,13 +25,13 @@
   height: 32px;
   color: #4b5563;
   font-size: 16px;
-  line-height: 20px;
-  vertical-align: top;
+  line-height: 1;
   background: transparent;
   border: 0;
   border-radius: 8px;
   cursor: pointer;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease;
 
   &:hover {
     color: #1769ff;
@@ -34,14 +43,22 @@
     outline-offset: 2px;
   }
 
-  .language-code {
-    font-weight: 700;
+  .language-name {
+    font-weight: 600;
     font-size: 13px;
     white-space: nowrap;
   }
 
+  .language-code {
+    display: none;
+    font-weight: 600;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
   .navbar-caret {
-    font-size: 9px;
+    font-size: 10px;
+    opacity: 0.7;
   }
 
   .navbar-globe {
@@ -55,6 +72,18 @@
     svg {
       position: relative;
       top: -1px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .drop-down {
+    .language-name {
+      display: none;
+    }
+
+    .language-code {
+      display: inline;
     }
   }
 }

@@ -14,7 +14,7 @@
 
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
-import { Button, Col, Row } from 'antd';
+import { Button } from 'antd';
 import SelectLang from 'components/SelectLang';
 import Avatar from './AvatarDropdown';
 import ModeToggle from './ModeToggle';
@@ -73,28 +73,27 @@ export class GlobalHeaderRight extends Component {
   render() {
     return (
       <div className={styles.right}>
-        <Row
-          justify="space-between"
-          align="middle"
-          gutter={10}
-          className={styles['right-row']}
-        >
-          <Col className={styles['right-links-col']}>
+        <div className={styles['right-row']}>
+          <div className={styles['right-links-col']}>
             {this.renderExtraLink()}
             {this.renderConsole()}
             {this.renderAdministrator()}
-          </Col>
+          </div>
           {this.renderExtra()}
-          <Col>
+          <div className={styles['right-language-col']}>
             <SelectLang className={styles['nav-language']} navbar />
-          </Col>
-          <Col>
+          </div>
+          <div className={styles['right-mode-col']}>
             <ModeToggle />
-          </Col>
-          <Col className={styles['right-avatar-col']}>
-            <Avatar menu />
-          </Col>
-        </Row>
+          </div>
+          <div className={styles['right-avatar-col']}>
+            <Avatar
+              menu
+              isAdminPage={this.isAdminPage}
+              isUserCenterPage={this.isUserCenterPage}
+            />
+          </div>
+        </div>
       </div>
     );
   }

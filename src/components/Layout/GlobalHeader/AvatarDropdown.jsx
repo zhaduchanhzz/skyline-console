@@ -66,6 +66,8 @@ export class AvatarDropdown extends React.Component {
       );
     }
     const { name: username } = this.user.user;
+    const { isAdminPage = false, isUserCenterPage = false } = this.props;
+    const { hasAdminPageRole = false } = this.rootStore;
     // const { selectedLang } = this.state.selectedLang;
     const menuHeaderDropdown = (
       <Menu className={styles.menu} onClick={this.onMenuClick}>
@@ -95,6 +97,34 @@ export class AvatarDropdown extends React.Component {
             {t('User Center')}
           </Button>
         </Menu.Item>
+        {(isAdminPage || isUserCenterPage) && (
+          <Menu.Item
+            key="mobileConsole"
+            className={`${styles['menu-item']} ${styles['mobile-nav-item']}`}
+          >
+            <Button
+              href="/base/overview"
+              type="link"
+              className={styles['menu-btn']}
+            >
+              {t('Console')}
+            </Button>
+          </Menu.Item>
+        )}
+        {hasAdminPageRole && !isAdminPage && (
+          <Menu.Item
+            key="mobileAdministrator"
+            className={`${styles['menu-item']} ${styles['mobile-nav-item']}`}
+          >
+            <Button
+              href="/base/overview-admin"
+              type="link"
+              className={styles['menu-btn']}
+            >
+              {t('Administrator')}
+            </Button>
+          </Menu.Item>
+        )}
         <Menu.Divider className={styles['menu-divider']} />
         <Menu.Item key="password" className={styles['menu-item']}>
           <ItemActionButtons

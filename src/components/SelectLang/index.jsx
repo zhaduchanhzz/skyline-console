@@ -16,7 +16,7 @@ import { Menu, Dropdown } from 'antd';
 import i18n from 'core/i18n';
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { DownOutlined, GlobalOutlined } from '@ant-design/icons';
+import { CheckOutlined, DownOutlined, GlobalOutlined } from '@ant-design/icons';
 import styles from './index.less';
 
 const { getLocale, setLocale, SUPPORT_LOCALES } = i18n;
@@ -29,30 +29,27 @@ const SelectLang = (props) => {
 
   const { className, navbar = false } = props;
   const selectedLang = getLocale();
-  const selectedLocale = SUPPORT_LOCALES.find(
-    (it) => it.value === selectedLang
-  );
+  const selectedLocale =
+    SUPPORT_LOCALES.find((it) => it.value === selectedLang) ||
+    SUPPORT_LOCALES[0];
 
   const changeLang = ({ key }) => {
     setVisible(false);
     setLocale(key, false);
   };
 
-  const locales = SUPPORT_LOCALES.map((it) => it.value);
-  const languageLabels = SUPPORT_LOCALES.map((it) => it.name);
-  const languageIcons = SUPPORT_LOCALES.map((it) => it.icon);
   const langMenu = (
     <Menu
       className={styles.menu}
-      selectedKeys={[selectedLang]}
+      selectedKeys={[selectedLocale.value]}
       onClick={changeLang}
     >
-      {locales.map((locale, index) => (
-        <Menu.Item key={locale}>
-          <span role="img" aria-label={languageLabels[index]}>
-            {languageIcons[index]}
-          </span>{' '}
-          {languageLabels[index]}
+      {SUPPORT_LOCALES.map((locale) => (
+        <Menu.Item key={locale.value}>
+          <span className={styles['menu-label']}>{locale.name}</span>
+          {locale.value === selectedLocale.value && (
+            <CheckOutlined className={styles['menu-check']} />
+          )}
         </Menu.Item>
       ))}
     </Menu>
@@ -71,14 +68,16 @@ const SelectLang = (props) => {
         aria-label={`${t('Switch Language')}: ${selectedLocale.name}`}
         aria-haspopup="menu"
         aria-expanded={visible}
+        title={`${t('Switch Language')}: ${selectedLocale.name}`}
       >
         <GlobalOutlined className={navbar ? styles['navbar-globe'] : ''} />
         {navbar && (
           <>
+            <span className={styles['language-name']}>
+              {selectedLocale.name}
+            </span>
             <span className={styles['language-code']}>
-              {selectedLang === 'zh-hans'
-                ? '中文'
-                : selectedLocale.icon.toUpperCase()}
+              {selectedLocale.icon.toUpperCase()}
             </span>
             <DownOutlined className={styles['navbar-caret']} />
           </>
