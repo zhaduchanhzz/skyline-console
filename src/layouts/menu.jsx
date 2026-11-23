@@ -31,6 +31,7 @@ import {
   MessageOutlined,
   CloudServerOutlined,
 } from '@ant-design/icons';
+import renderKagentChatMenu from './kagent-chat-menu';
 
 const renderMenu = (t) => {
   if (!t) {
@@ -1019,6 +1020,7 @@ const renderMenu = (t) => {
         },
       ],
     },
+    ...renderKagentChatMenu(t),
     {
       type: 'divider',
       key: 'help-divider',

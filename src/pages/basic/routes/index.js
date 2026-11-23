@@ -80,6 +80,9 @@ const BasicNetworkApp = lazy(() =>
 const BackupRestore = lazy(() =>
   import(/* webpackChunkName: "backup-restore" */ 'pages/backup-restore/App')
 );
+const KagentChat = lazy(() =>
+  import(/* webpackChunkName: "kagentchat" */ 'pages/kagentchat/App')
+);
 const PATH = '/';
 
 export default [
@@ -176,6 +179,10 @@ export default [
       {
         path: `/backup-restore`,
         component: BackupRestore,
+      },
+      {
+        path: `/kagentchat`,
+        component: KagentChat,
       },
       { path: '*', component: E404 },
     ],

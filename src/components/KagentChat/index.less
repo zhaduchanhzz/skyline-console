@@ -1,0 +1,120 @@
+@import '~styles/variables';
+
+// Below antd modal/drawer (1000), notification (1010) and dropdown (1050)
+// so the widget never covers dialogs or menus opened by OpenStack pages.
+@kagent-widget-z-index: 999;
+@kagent-widget-gap: 16px;
+
+.frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: @size-medium;
+  overflow: auto;
+  background-color: #fff;
+}
+
+.trigger {
+  position: fixed;
+  right: @kagent-widget-gap;
+  bottom: @kagent-widget-gap;
+  z-index: @kagent-widget-z-index;
+  width: 48px;
+  height: 48px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 20%);
+  opacity: 0.9;
+
+  &:hover,
+  &:focus {
+    opacity: 1;
+  }
+
+  :global(.anticon) {
+    font-size: 22px;
+  }
+}
+
+.panel {
+  position: fixed;
+  right: @kagent-widget-gap;
+  bottom: @kagent-widget-gap;
+  z-index: @kagent-widget-z-index;
+  display: flex;
+  flex-direction: column;
+  width: 420px;
+  max-width: calc(100vw - 2 * @kagent-widget-gap);
+  height: 640px;
+  max-height: calc(100vh - @header-height - 2 * @kagent-widget-gap);
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 18%);
+}
+
+// Keep the iframe mounted while closed so the conversation survives.
+.panel-hidden {
+  display: none;
+}
+
+.panel-header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 4px 0 @size-medium;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.panel-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  overflow: hidden;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.panel-body {
+  flex: 1;
+  min-height: 0;
+}
+
+.page {
+  height: 100%;
+}
+
+// Phones: take the whole area below the Skyline header.
+@media (max-width: 575px) {
+  .panel {
+    top: @header-height;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+  }
+}

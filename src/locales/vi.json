@@ -3980,5 +3980,15 @@
   "Loading...": "Đang tải...",
   "Taking a long time...": "Đang mất nhiều thời gian hơn dự kiến...",
   "Error!": "Lỗi!",
-  "on": "trên"
+  "on": "trên",
+  "AI Assistant": "Trợ lý AI",
+  "Open AI Assistant": "Mở Trợ lý AI",
+  "Open in full page": "Mở toàn trang",
+  "The AI Assistant is taking too long to respond.": "Trợ lý AI phản hồi quá lâu.",
+  "The kagent service may be unavailable or may not allow embedding. Retry, or contact your administrator if the problem continues.": "Dịch vụ kagent có thể đang không khả dụng hoặc không cho phép nhúng. Hãy thử lại, hoặc liên hệ quản trị viên nếu sự cố vẫn tiếp diễn.",
+  "You do not have permission to use the AI Assistant.": "Bạn không có quyền sử dụng Trợ lý AI.",
+  "Contact your administrator to request access.": "Liên hệ quản trị viên để được cấp quyền.",
+  "The AI Assistant is not configured.": "Trợ lý AI chưa được cấu hình.",
+  "Ask your administrator to set kagentChat in the console configuration.": "Hãy yêu cầu quản trị viên khai báo kagentChat trong cấu hình console.",
+  "The AI Assistant configuration is invalid.": "Cấu hình Trợ lý AI không hợp lệ."
 }

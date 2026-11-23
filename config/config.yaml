@@ -9,3 +9,11 @@ globalVariables:
   supportLanguages: # use value in i18n.js
     - vi
     - en
+  # AI Assistant (kagent chat). Leave unset to hide the feature. Usually set
+  # per environment in config/local_config.yaml; see KAGENT_CHAT.md.
+  # kagentChat:
+  #   url: /kagent            # kagent UI: same-origin path (preferred) or https URL
+  #   namespace: kagent       # namespace of the existing Agent resource
+  #   agent: k8s-agent        # name of the existing Agent resource
+  #   uiVersion: v1           # v1 = kagent 1.x UI (default), v0 = kagent 0.10.x UI
+  #   allowedRoles: []        # Keystone role names; empty = all signed-in users

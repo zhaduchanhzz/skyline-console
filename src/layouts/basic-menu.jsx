@@ -7,6 +7,7 @@ import {
   BookOutlined,
   PlayCircleOutlined,
 } from '@ant-design/icons';
+import renderKagentChatMenu from './kagent-chat-menu';
 
 // Menu for the Basic console mode. This is intentionally a small subset
 // of the Advanced menu (see `menu.jsx`). Detail routes are preserved so
@@ -326,6 +327,7 @@ const renderBasicMenu = (t) => {
         },
       ],
     },
+    ...renderKagentChatMenu(t),
     // Help section — same links Advanced surfaces at the bottom of the
     // sidebar. The `basicHelp` marker lets us style these items with a
     // subtle grey background.

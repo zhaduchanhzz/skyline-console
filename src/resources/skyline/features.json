@@ -293,6 +293,7 @@
     "parent": "system_maintenance",
     "paths": ["/maintenance-notifications/banners"]
   },
+  "kagentchat": { "paths": ["/kagentchat"] },
   "management": { "paths": ["/management"] },
   "management_recycle_bin": {
     "parent": "management",

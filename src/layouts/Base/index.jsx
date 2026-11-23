@@ -27,6 +27,7 @@ import GlobalHeader from 'components/Layout/GlobalHeader';
 import { setRouteMap, getPath } from 'utils/route-map';
 import { MODE_BASIC } from 'utils/console-mode';
 import ModeChooserModal from 'components/ModeChooserModal';
+import KagentChatWidget from 'components/KagentChat/ChatWidget';
 import renderAdminMenu from '../admin-menu';
 import renderMenu from '../menu';
 import renderBasicMenu from '../basic-menu';
@@ -316,6 +317,7 @@ export class BaseLayout extends Component {
         />
         {/* One-time Basic/Advanced chooser for fresh non-admin users. */}
         <ModeChooserModal />
+        <KagentChatWidget location={this.props.location} />
       </div>
     );
   }

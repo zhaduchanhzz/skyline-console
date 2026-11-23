@@ -3981,5 +3981,15 @@
   "Taking a long time...": "加载时间较长...",
   "Type is required": "请选择类型",
   "Value is required": "请输入值",
-  "on": "挂载于"
+  "on": "挂载于",
+  "AI Assistant": "AI 助手",
+  "Open AI Assistant": "打开 AI 助手",
+  "Open in full page": "全屏打开",
+  "The AI Assistant is taking too long to respond.": "AI 助手响应时间过长。",
+  "The kagent service may be unavailable or may not allow embedding. Retry, or contact your administrator if the problem continues.": "kagent 服务可能不可用或不允许嵌入。请重试，如问题持续请联系管理员。",
+  "You do not have permission to use the AI Assistant.": "您没有使用 AI 助手的权限。",
+  "Contact your administrator to request access.": "请联系管理员申请访问权限。",
+  "The AI Assistant is not configured.": "AI 助手尚未配置。",
+  "Ask your administrator to set kagentChat in the console configuration.": "请管理员在控制台配置中设置 kagentChat。",
+  "The AI Assistant configuration is invalid.": "AI 助手配置无效。"
 }

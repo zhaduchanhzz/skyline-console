@@ -3980,5 +3980,15 @@
   "Loading...": "Loading...",
   "Taking a long time...": "Taking a long time...",
   "Error!": "Error!",
-  "on": "on"
+  "on": "on",
+  "AI Assistant": "AI Assistant",
+  "Open AI Assistant": "Open AI Assistant",
+  "Open in full page": "Open in full page",
+  "The AI Assistant is taking too long to respond.": "The AI Assistant is taking too long to respond.",
+  "The kagent service may be unavailable or may not allow embedding. Retry, or contact your administrator if the problem continues.": "The kagent service may be unavailable or may not allow embedding. Retry, or contact your administrator if the problem continues.",
+  "You do not have permission to use the AI Assistant.": "You do not have permission to use the AI Assistant.",
+  "Contact your administrator to request access.": "Contact your administrator to request access.",
+  "The AI Assistant is not configured.": "The AI Assistant is not configured.",
+  "Ask your administrator to set kagentChat in the console configuration.": "Ask your administrator to set kagentChat in the console configuration.",
+  "The AI Assistant configuration is invalid.": "The AI Assistant configuration is invalid."
 }

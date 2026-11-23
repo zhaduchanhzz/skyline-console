@@ -32,6 +32,7 @@ import {
   ScheduleOutlined,
   MessageOutlined,
 } from '@ant-design/icons';
+import renderKagentChatMenu from './kagent-chat-menu';
 
 const renderMenu = (t) => {
   if (!t) {
@@ -1209,6 +1210,7 @@ const renderMenu = (t) => {
         },
       ],
     },
+    ...renderKagentChatMenu(t, { admin: true }),
     {
       type: 'divider',
       key: 'help-divider-admin',
