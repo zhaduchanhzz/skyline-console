@@ -1,17 +1,13 @@
-// Build-time configuration for the kagent chat integration.
+// Runtime configuration for the kagent chat integration.
 //
-// Values come from `globalVariables.kagentChat` in config/config.yaml (or
-// config/local_config.yaml) and are injected by webpack as GLOBAL_VARIABLES.
-// Users cannot change the iframe target: it is fixed per build.
+// Values come from the `kagent_chat` block of skyline.yaml, which
+// skyline-apiserver returns with GET /api/v1/features (featureStore.kagentChat).
+// Users cannot change the iframe target: it is fixed by the deployment.
 
 export const KAGENT_CHAT_FEATURE = 'kagentchat';
 export const KAGENT_CHAT_PAGE_PATH = '/kagentchat/chat';
 
 const SEGMENT = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
-
-const readRawConfig = () =>
-  (typeof GLOBAL_VARIABLES !== 'undefined' && GLOBAL_VARIABLES.kagentChat) ||
-  null;
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -42,6 +38,19 @@ const UI_ROUTES = {
 
 const trimSlash = (value) => value.replace(/\/+$/, '');
 
+// `url` may also be the agent's new-chat link copied from kagent, e.g.
+// https://kagent.example.com/agents/kagent/chat-agent/chat (v0) or .../new
+// (v1). Split it into base path, namespace, agent and UI version.
+const CHAT_LINK = /^(.*)\/agents\/([^/]+)\/([^/]+)\/(chat|new)\/?$/;
+const LINK_VERSION = { chat: 'v0', new: 'v1' };
+
+const splitChatLink = (pathname) => {
+  const match = CHAT_LINK.exec(pathname);
+  if (!match) return null;
+  const [, basePath, namespace, agent, kind] = match;
+  return { basePath, namespace, agent, uiVersion: LINK_VERSION[kind] };
+};
+
 // Accept an absolute http(s) URL or a same-origin absolute path. Reject
 // protocol-relative ("//host"), javascript:, data: and other schemes.
 const parseBaseUrl = (value, origin) => {
@@ -61,40 +70,68 @@ const parseBaseUrl = (value, origin) => {
 };
 
 // Returns { status, ...config }:
-//   status 'disabled' -> no kagentChat block configured at all
+//   status 'disabled' -> no kagent_chat block in skyline.yaml
 //   status 'invalid'  -> configured but unusable; `error` explains why
 //   status 'ok'       -> `chatUrl` (new chat) and `origin` are safe to use
 export const getKagentChatConfig = (
-  raw = readRawConfig(),
+  settings = null,
   origin = window.location.origin
 ) => {
-  if (!raw || typeof raw !== 'object' || !raw.url) {
+  if (!settings || typeof settings !== 'object' || !settings.url) {
     return { status: 'disabled' };
   }
+  // skyline.yaml keys are snake_case; the API sends null for unset keys.
+  const pick = (key) => (settings[key] === null ? undefined : settings[key]);
+  const raw = {
+    url: settings.url,
+    namespace: pick('namespace'),
+    agent: pick('agent'),
+    uiVersion: pick('ui_version'),
+    allowedRoles: pick('allowed_roles'),
+  };
   const base = parseBaseUrl(raw.url, origin);
   if (!base) {
     return {
       status: 'invalid',
       error:
-        'kagentChat.url must be an http(s) URL or a path starting with "/".',
+        'kagent_chat.url must be an http(s) URL or a path starting with "/".',
     };
   }
-  const { namespace, agent } = raw;
+  const link = splitChatLink(base.pathname);
+  const fromLink = (key) => {
+    if (!link) return { value: raw[key] };
+    if (raw[key] !== undefined && raw[key] !== link[key]) {
+      return { conflict: true };
+    }
+    return { value: link[key] };
+  };
+  const ns = fromLink('namespace');
+  const ag = fromLink('agent');
+  const ver = fromLink('uiVersion');
+  if (ns.conflict || ag.conflict || ver.conflict) {
+    return {
+      status: 'invalid',
+      error:
+        'kagent_chat.namespace, agent and ui_version must match the chat link in kagent_chat.url.',
+    };
+  }
+  const namespace = ns.value;
+  const agent = ag.value;
   if (!SEGMENT.test(namespace || '') || !SEGMENT.test(agent || '')) {
     return {
       status: 'invalid',
       error:
-        'kagentChat.namespace and kagentChat.agent must be Kubernetes resource names.',
+        'kagent_chat.namespace and kagent_chat.agent must be Kubernetes resource names.',
     };
   }
-  const uiVersion = raw.uiVersion === undefined ? 'v1' : raw.uiVersion;
+  const uiVersion = ver.value === undefined ? 'v1' : ver.value;
   if (!UI_ROUTES[uiVersion]) {
     return {
       status: 'invalid',
-      error: 'kagentChat.uiVersion must be "v1" or "v0".',
+      error: 'kagent_chat.ui_version must be "v1" or "v0".',
     };
   }
-  const basePath = trimSlash(base.pathname);
+  const basePath = trimSlash(link ? link.basePath : base.pathname);
   const routes = UI_ROUTES[uiVersion](basePath, namespace, agent);
   const chatUrl = `${base.origin}${routes.newChat}`;
   const allowedRoles = Array.isArray(raw.allowedRoles)

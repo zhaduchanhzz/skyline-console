@@ -1,6 +1,7 @@
 import React from 'react';
 import { RobotOutlined } from '@ant-design/icons';
 import globalRootStore from 'stores/root';
+import featureStore from 'stores/skyline/features';
 import {
   getKagentChatConfig,
   hasKagentChatRole,
@@ -8,10 +9,11 @@ import {
 } from 'utils/kagent-chat';
 
 // The `kagentchat` feature flag is applied later by filterFeatureMenu (path
-// based). This only hides the entry when the build has no kagent config or
-// the user's roles are not in kagentChat.allowedRoles.
+// based). This only hides the entry when
+// skyline.yaml has no kagent_chat block or the user's roles are not in
+// kagent_chat.allowed_roles.
 export const isKagentChatAvailable = () => {
-  const config = getKagentChatConfig();
+  const config = getKagentChatConfig(featureStore.kagentChat);
   return (
     config.status !== 'disabled' &&
     hasKagentChatRole(config, globalRootStore.roles)

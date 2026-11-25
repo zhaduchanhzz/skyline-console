@@ -3989,6 +3989,6 @@
   "You do not have permission to use the AI Assistant.": "Bạn không có quyền sử dụng Trợ lý AI.",
   "Contact your administrator to request access.": "Liên hệ quản trị viên để được cấp quyền.",
   "The AI Assistant is not configured.": "Trợ lý AI chưa được cấu hình.",
-  "Ask your administrator to set kagentChat in the console configuration.": "Hãy yêu cầu quản trị viên khai báo kagentChat trong cấu hình console.",
+  "Ask your administrator to set kagent_chat in skyline.yaml.": "Hãy yêu cầu quản trị viên khai báo kagent_chat trong skyline.yaml.",
   "The AI Assistant configuration is invalid.": "Cấu hình Trợ lý AI không hợp lệ."
 }

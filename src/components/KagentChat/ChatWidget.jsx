@@ -26,18 +26,23 @@ export class ChatWidget extends Component {
   constructor(props) {
     super(props);
     this.frameRef = createRef();
-    this.config = getKagentChatConfig();
     // `started`: the iframe is created on first open and then kept mounted
     // (hidden while closed) so closing the panel never restarts the chat.
     this.state = { open: false, started: false };
   }
 
+  // From skyline.yaml via GET /features; loaded before the layout renders.
+  get config() {
+    return getKagentChatConfig(featureStore.kagentChat);
+  }
+
   get visible() {
     const { rootStore } = this.props;
+    const { config } = this;
     return (
-      this.config.status !== 'disabled' &&
+      config.status !== 'disabled' &&
       featureStore.isEnabled(KAGENT_CHAT_FEATURE) &&
-      hasKagentChatRole(this.config, rootStore.roles) &&
+      hasKagentChatRole(config, rootStore.roles) &&
       !!rootStore.user
     );
   }

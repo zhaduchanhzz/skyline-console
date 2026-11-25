@@ -1,6 +1,10 @@
 // Local development API for running the console without an OpenStack cloud.
 // This middleware is installed only by the API=local webpack configuration.
 const { randomBytes } = require('crypto');
+const fs = require('fs');
+const nodePath = require('path');
+const yaml = require('js-yaml');
+const { getServerConfig } = require('./utils');
 
 const API_PREFIX = '/api/openstack/skyline/api/v1';
 const SESSION_COOKIE = 'skyline_local_session';
@@ -166,6 +170,36 @@ const readService = (path) => {
   return collection ? { [collection[2]]: [], count: 0 } : null;
 };
 
+// GET /features returns `features` and `kagent_chat` from skyline-apiserver's
+// skyline.yaml, like the real API. Default path: the sibling checkout
+// ../skyline-apiserver/etc/skyline.yaml; override with SKYLINE_YAML.
+// The file is read on every request, so edits apply without a restart.
+// Falls back to the `localMock` block of config/local_config.yaml when the
+// file does not exist.
+const SKYLINE_YAML =
+  process.env.SKYLINE_YAML ||
+  nodePath.resolve(__dirname, '../../skyline-apiserver/etc/skyline.yaml');
+
+const readFeatures = () => {
+  let source;
+  if (fs.existsSync(SKYLINE_YAML)) {
+    try {
+      source = yaml.load(fs.readFileSync(SKYLINE_YAML, 'utf8')) || {};
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`standalone-mock: cannot parse ${SKYLINE_YAML}`, error);
+      source = {};
+    }
+  } else {
+    source = getServerConfig('localMock') || {};
+  }
+  const { features, kagent_chat: kagentChat } = source;
+  return {
+    features: features || {},
+    ...(kagentChat ? { kagent_chat: kagentChat } : {}),
+  };
+};
+
 const createStandaloneMock = () => {
   const sessions = new Map();
 
@@ -264,7 +298,7 @@ const createStandaloneMock = () => {
       [`${API_PREFIX}/policies`]: {
         policies: [{ rule: 'admin', allowed: true }],
       },
-      [`${API_PREFIX}/features`]: { features: {} },
+      [`${API_PREFIX}/features`]: readFeatures(),
       [`${API_PREFIX}/message-banners/active`]: { message_banners: [] },
       [`${API_PREFIX}/settings`]: { settings: [] },
       [`${API_PREFIX}/extension/servers`]: { servers: [], count: 0 },

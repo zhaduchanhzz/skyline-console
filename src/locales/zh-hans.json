@@ -3990,6 +3990,6 @@
   "You do not have permission to use the AI Assistant.": "您没有使用 AI 助手的权限。",
   "Contact your administrator to request access.": "请联系管理员申请访问权限。",
   "The AI Assistant is not configured.": "AI 助手尚未配置。",
-  "Ask your administrator to set kagentChat in the console configuration.": "请管理员在控制台配置中设置 kagentChat。",
+  "Ask your administrator to set kagent_chat in skyline.yaml.": "请管理员在 skyline.yaml 中设置 kagent_chat。",
   "The AI Assistant configuration is invalid.": "AI 助手配置无效。"
 }

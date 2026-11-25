@@ -25,44 +25,65 @@ hội thoại rỗng.
 
 ## 2. Cấu hình
 
-Cấu hình nằm trong `globalVariables.kagentChat` và được đóng gói **lúc build**
-(cùng cơ chế với `defaultLanguage`). Đặt trong `config/local_config.yaml` cho
-từng môi trường. Lưu ý: khi `local_config.yaml` có khối `globalVariables` thì
-khối này thay thế toàn bộ khối trong `config.yaml`, nên phải chép lại
-`defaultLanguage` và `supportLanguages`.
+Cấu hình nằm trong khối `kagent_chat` của **`skyline.yaml` (skyline-apiserver)**
+và được đọc **lúc chạy**: apiserver trả nó cùng feature flag qua
+`GET /api/v1/features` (chỉ cho người đã đăng nhập). Đổi cấu hình chỉ cần khởi
+động lại apiserver; **không phải build lại console**.
+
+Cách ngắn nhất là dán link chat của agent, copy từ kagent:
 
 ```yaml
-globalVariables:
-  defaultLanguage: vi
-  supportLanguages:
-    - vi
-    - en
-  kagentChat:
-    url: /kagent # bắt buộc
-    namespace: kagent # bắt buộc
-    agent: k8s-agent # bắt buộc
-    uiVersion: v1 # tuỳ chọn: v1 | v0
-    allowedRoles: [] # tuỳ chọn
+kagent_chat:
+  url: https://kagent.openstack.dev/agents/kagent/chat-agent/chat
 ```
 
-| Khóa                 | Ý nghĩa                                                                                                                                                                                                               |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `url`                | Địa chỉ kagent UI. Nên dùng đường dẫn cùng origin (`/kagent`, qua reverse proxy ở mục 4). Cũng nhận URL `http(s)://...` đầy đủ. URL có user/password, query hoặc fragment, `//host`, `javascript:`... đều bị từ chối. |
-| `namespace`, `agent` | Namespace và tên resource `Agent` đã có trong cluster. Phải là tên Kubernetes hợp lệ.                                                                                                                                 |
-| `uiVersion`          | Chọn bảng route ở mục 1.                                                                                                                                                                                              |
-| `allowedRoles`       | Danh sách tên role Keystone được thấy tính năng. Để trống thì mọi người dùng đã đăng nhập đều thấy. Đây chỉ là lớp ẩn giao diện, **không phải lớp bảo mật** (xem mục 5).                                              |
+Console tự tách base URL, namespace, agent và phiên bản UI từ link: đuôi `/chat`
+là kagent v0.x, đuôi `/new` là kagent v1.x. Cũng có thể khai báo đầy đủ:
+
+```yaml
+kagent_chat:
+  url: /kagent # base URL của kagent UI
+  namespace: kagent
+  agent: k8s-agent
+  ui_version: v1 # v1 (mặc định) | v0
+  allowed_roles: [] # tuỳ chọn
+```
+
+| Khóa                 | Ý nghĩa                                                                                                                                                                                                                  |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `url`                | Bắt buộc. Link chat của agent, hoặc base URL của kagent UI. Nên dùng đường dẫn cùng origin (`/kagent`, qua reverse proxy ở mục 4). URL có user/password, query hoặc fragment, `//host`, `javascript:`... đều bị từ chối. |
+| `namespace`, `agent` | Bắt buộc khi `url` là base URL. Namespace và tên resource `Agent` đã có trong cluster. Khi `url` là link chat, nếu khai báo thì phải khớp với link.                                                                      |
+| `ui_version`         | Chọn bảng route ở mục 1. Khi `url` là link chat, nếu khai báo thì phải khớp với đuôi link.                                                                                                                               |
+| `allowed_roles`      | Danh sách tên role Keystone được thấy tính năng. Để trống thì mọi người dùng đã đăng nhập đều thấy. Đây chỉ là lớp ẩn giao diện, **không phải lớp bảo mật** (xem mục 5).                                                 |
+
+Apiserver kiểm tra kiểu dữ liệu và từ chối khởi động khi khối này sai rõ ràng
+(khóa lạ, `url` không phải http(s) hay đường dẫn, `ui_version` khác `v0`/`v1`).
+Console kiểm tra lại URL và tên trước khi dùng.
 
 Hành vi theo trạng thái cấu hình:
 
-- **Không có `kagentChat`**: menu và widget đều ẩn. Truy cập thẳng URL trang chat
-  sẽ thấy thông báo "Trợ lý AI chưa được cấu hình".
+- **Không có `kagent_chat`**: menu và widget đều ẩn. Truy cập thẳng URL trang
+  chat sẽ thấy thông báo "Trợ lý AI chưa được cấu hình".
 - **Cấu hình sai**: menu và widget vẫn hiện, nhưng hiển thị lỗi cấu hình kèm lý do.
-- Người dùng **không có trong `allowedRoles`**: menu và widget ẩn, trang chat
+- Người dùng **không có trong `allowed_roles`**: menu và widget ẩn, trang chat
   báo không có quyền.
+- Skyline-apiserver bản gốc (chưa có `kagent_chat`): tính năng ẩn.
 
 Người dùng không sửa được URL của iframe. Tham số duy nhất đọc từ URL của
 console là `?session=` trên trang chat, và tham số này chỉ nhận các ký tự
 `[A-Za-z0-9_-]`.
+
+Khi chạy console bằng `npm run local` (mock API, không có apiserver), mock
+cũng đọc `features` và `kagent_chat` từ
+`../skyline-apiserver/etc/skyline.yaml` (đọc lại mỗi request, sửa xong chỉ cần
+tải lại trang). Dùng file khác bằng biến môi trường `SKYLINE_YAML`:
+
+```sh
+SKYLINE_YAML=/etc/skyline/skyline.yaml npm run local
+```
+
+Chỉ khi không tìm thấy file đó, mock mới dùng khối `localMock` trong
+`config/local_config.yaml`.
 
 ## 3. Bật/tắt bằng feature flag
 
@@ -80,7 +101,7 @@ Khi tắt:
 - widget bị ẩn;
 - `/kagentchat/chat` và `/kagentchat/chat-admin` hiển thị "Không thể hiển thị mục này." (`Right.jsx`).
 
-Khi không đặt giá trị nào, tính năng được bật nếu đã có `kagentChat`.
+Khi không đặt giá trị nào, tính năng được bật nếu đã có `kagent_chat`.
 
 ## 4. Reverse proxy cùng origin (khuyến nghị)
 
@@ -132,7 +153,7 @@ sang trang đầy đủ.
 
 ## 5. Bảo mật: những việc phải làm ngoài console
 
-Feature flag và `allowedRoles` chỉ ẩn giao diện. Kiểm soát thật phải đặt ở
+Feature flag và `allowed_roles` chỉ ẩn giao diện. Kiểm soát thật phải đặt ở
 proxy và ở kagent:
 
 1. **Chặn truy cập kagent khi chưa đăng nhập Skyline**: dùng `auth_request` ở
@@ -164,8 +185,8 @@ proxy và ở kagent:
    Với domain riêng, thay `'self'` bằng origin của Skyline. Nếu kagent hoặc
    ingress gửi `X-Frame-Options: DENY`, iframe sẽ bị trình duyệt chặn.
 
-5. Không đưa token hay API key vào cấu hình console: chúng sẽ nằm trong bundle
-   JavaScript công khai.
+5. Không đưa token hay API key vào `kagent_chat`: mọi giá trị trong khối này
+   được gửi xuống trình duyệt của người dùng đã đăng nhập.
 6. Iframe dùng `sandbox` không có `allow-top-navigation`, nên kagent không thể
    điều hướng trang Skyline. Console không dùng `postMessage` (kagent cũng
    không gửi).
@@ -192,7 +213,7 @@ npm run build          # Windows: npm run build:win
 
 Bundle được ghi vào `skyline_console/static` và sinh thêm chunk
 `kagentchat.bundle.*.js`. Phần còn lại của console không tải chunk này cho tới
-khi người dùng mở trang chat. Đổi `kagentChat` thì phải build lại.
+khi người dùng mở trang chat. Đổi `kagent_chat` không cần build lại (mục 2).
 
 ## 8. Kiểm tra sau triển khai
 
@@ -220,5 +241,11 @@ khi người dùng mở trang chat. Đổi `kagentChat` thì phải build lại.
   chung với Keystone chưa được tích hợp.
 - Tách hội thoại theo người dùng phụ thuộc vào cấu hình xác thực của kagent
   (mục 5.2).
-- Cấu hình nằm trong bundle lúc build; chưa có cấu hình runtime qua
-  skyline-apiserver.
+- Cấu hình cần skyline-apiserver có hỗ trợ `kagent_chat` (đã thêm trong repo
+  skyline-apiserver đi kèm). Với apiserver bản gốc, tính năng bị ẩn.
+- kagent v0.10.x hiện wizard "Let's get you started" ở lần mở đầu tiên trên mỗi
+  trình duyệt (lưu cờ `kagent-onboarding` trong localStorage của origin kagent),
+  kể cả khi nằm trong iframe. Người dùng phải bấm "Skip wizard" một lần.
+- Chứng chỉ HTTPS của kagent phải được trình duyệt tin cậy. Với CA nội bộ, phải
+  cài root CA vào máy người dùng; iframe không cho phép bấm "tiếp tục" qua cảnh
+  báo chứng chỉ.

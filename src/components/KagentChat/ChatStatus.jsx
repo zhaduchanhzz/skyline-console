@@ -18,7 +18,7 @@ const ChatStatus = ({ config, allowed = true }) => {
         status="info"
         title={t('The AI Assistant is not configured.')}
         subTitle={t(
-          'Ask your administrator to set kagentChat in the console configuration.'
+          'Ask your administrator to set kagent_chat in skyline.yaml.'
         )}
       />
     );

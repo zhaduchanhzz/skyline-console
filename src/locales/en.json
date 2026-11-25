@@ -3989,6 +3989,6 @@
   "You do not have permission to use the AI Assistant.": "You do not have permission to use the AI Assistant.",
   "Contact your administrator to request access.": "Contact your administrator to request access.",
   "The AI Assistant is not configured.": "The AI Assistant is not configured.",
-  "Ask your administrator to set kagentChat in the console configuration.": "Ask your administrator to set kagentChat in the console configuration.",
+  "Ask your administrator to set kagent_chat in skyline.yaml.": "Ask your administrator to set kagent_chat in skyline.yaml.",
   "The AI Assistant configuration is invalid.": "The AI Assistant configuration is invalid."
 }

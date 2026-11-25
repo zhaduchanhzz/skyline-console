@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { inject, observer } from 'mobx-react';
+import featureStore from 'stores/skyline/features';
 import ChatFrame from 'components/KagentChat/ChatFrame';
 import ChatStatus from 'components/KagentChat/ChatStatus';
 import styles from 'components/KagentChat/index.less';
@@ -12,7 +13,9 @@ import {
 // Route access for the `kagentchat` feature flag is enforced by the Base
 // layout (Right.jsx) through features.json, like every other panel.
 export class Chat extends Component {
-  config = getKagentChatConfig();
+  get config() {
+    return getKagentChatConfig(featureStore.kagentChat);
+  }
 
   get src() {
     const session = new URLSearchParams(this.props.location.search).get(

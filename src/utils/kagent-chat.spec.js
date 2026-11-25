@@ -22,6 +22,19 @@ describe('getKagentChatConfig', () => {
     expect(config({}).status).toBe('disabled');
   });
 
+  it('reads the skyline-apiserver response (null for unset keys)', () => {
+    const result = config({
+      url: 'https://kagent.example.com/agents/kagent/chat-agent/chat',
+      namespace: null,
+      agent: null,
+      ui_version: null,
+      allowed_roles: ['admin'],
+    });
+    expect(result.status).toBe('ok');
+    expect(result.uiVersion).toBe('v0');
+    expect(result.allowedRoles).toEqual(['admin']);
+  });
+
   it('builds the kagent v1 new-chat URL by default', () => {
     const result = config(base);
     expect(result.status).toBe('ok');
@@ -30,7 +43,7 @@ describe('getKagentChatConfig', () => {
   });
 
   it('builds the kagent v0 new-chat URL', () => {
-    const result = config({ ...base, uiVersion: 'v0' });
+    const result = config({ ...base, ui_version: 'v0' });
     expect(result.chatUrl).toBe(
       `${ORIGIN}/kagent/agents/kagent/k8s-agent/chat`
     );
@@ -62,8 +75,45 @@ describe('getKagentChatConfig', () => {
     expect(config({ ...base, agent: undefined }).status).toBe('invalid');
   });
 
+  it('accepts a kagent chat link as url (v0 and v1)', () => {
+    const v0 = config({
+      url: 'https://kagent.example.com/agents/kagent/chat-agent/chat',
+    });
+    expect(v0.status).toBe('ok');
+    expect(v0.chatUrl).toBe(
+      'https://kagent.example.com/agents/kagent/chat-agent/chat'
+    );
+    expect([v0.namespace, v0.agent, v0.uiVersion]).toEqual([
+      'kagent',
+      'chat-agent',
+      'v0',
+    ]);
+    expect(getSessionChatUrl(v0, 'abc')).toBe(
+      'https://kagent.example.com/agents/kagent/chat-agent/chat/abc'
+    );
+
+    const v1 = config({ url: '/kagent/agents/kagent/k8s-agent/new/' });
+    expect(v1.chatUrl).toBe(`${ORIGIN}/kagent/agents/kagent/k8s-agent/new`);
+    expect(v1.uiVersion).toBe('v1');
+    expect(getSessionChatUrl(v1, 'abc')).toBe(
+      `${ORIGIN}/kagent/agents/abc/chat`
+    );
+  });
+
+  it('rejects a chat link that contradicts other keys', () => {
+    const url = 'https://kagent.example.com/agents/kagent/chat-agent/chat';
+    expect(config({ url, agent: 'other' }).status).toBe('invalid');
+    expect(config({ url, ui_version: 'v1' }).status).toBe('invalid');
+    expect(config({ url, namespace: 'kagent', ui_version: 'v0' }).status).toBe(
+      'ok'
+    );
+    expect(
+      config({ url: 'https://kagent.example.com/agents/../x/chat' }).status
+    ).toBe('invalid');
+  });
+
   it('rejects unknown kagent UI versions', () => {
-    expect(config({ ...base, uiVersion: 'v2' }).status).toBe('invalid');
+    expect(config({ ...base, ui_version: 'v2' }).status).toBe('invalid');
   });
 });
 
@@ -75,7 +125,7 @@ describe('sessions', () => {
   });
 
   it('opens an existing v0 conversation', () => {
-    const v0 = config({ ...base, uiVersion: 'v0' });
+    const v0 = config({ ...base, ui_version: 'v0' });
     expect(getSessionChatUrl(v0, '42')).toBe(
       `${ORIGIN}/kagent/agents/kagent/k8s-agent/chat/42`
     );
@@ -130,7 +180,7 @@ describe('hasKagentChatRole', () => {
   });
 
   it('requires one of the configured roles', () => {
-    const c = config({ ...base, allowedRoles: ['admin', 'ai-user'] });
+    const c = config({ ...base, allowed_roles: ['admin', 'ai-user'] });
     expect(hasKagentChatRole(c, [{ name: 'member' }])).toBe(false);
     expect(hasKagentChatRole(c, [{ name: 'ai-user' }])).toBe(true);
   });
